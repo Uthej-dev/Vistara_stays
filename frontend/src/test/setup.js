@@ -33,4 +33,5 @@ apiClient.defaults.adapter = offlineAdapter
 afterEach(() => {
   apiClient.defaults.adapter = offlineAdapter
   setAccessToken(null)
+  document.cookie = 'vs_has_session=; Max-Age=0; path=/'
 })

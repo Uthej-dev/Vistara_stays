@@ -56,6 +56,7 @@ async def test_signup_creates_customer_and_sets_secure_refresh_cookie(client, db
     assert body["user"]["email_verified"] is False
     assert "password_hash" not in body["user"]
     cookie_header = response.headers["set-cookie"]
+    assert "vs_has_session=1" in cookie_header  # non-secret hint the frontend can read
     assert "vs_refresh=" in cookie_header
     assert "HttpOnly" in cookie_header and "Path=/api/v1/auth" in cookie_header
     assert "samesite=lax" in cookie_header.lower()

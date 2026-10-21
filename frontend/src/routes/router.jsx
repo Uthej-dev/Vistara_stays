@@ -13,10 +13,10 @@ import { ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage } from '../pages
 import AccountPage from '../pages/AccountPage'
 import FavouritesPage from '../pages/FavouritesPage'
 import RequireAuth from '../features/auth/RequireAuth'
+import ResortPage from '../pages/ResortPage'
 
 // Routes that later phases implement. Listed here so every link in the UI resolves.
 const UPCOMING = [
-  { path: 'resorts/:slug', title: 'Resort details', phase: 6 },
   { path: 'trips', title: 'Your trips', phase: 7 },
   { path: 'owners', title: 'List your property', phase: 8 },
   { path: 'owner', title: 'Owner dashboard', phase: 8 },
@@ -37,6 +37,7 @@ export const routes = [
       { path: 'credits', element: <CreditsPage /> },
       { path: 'destinations', element: <DestinationsPage /> },
       { path: 'destinations/:slug', element: <DestinationPage /> },
+      { path: 'resorts/:slug', element: <ResortPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignupPage /> },
       { path: 'owners/register', element: <SignupPage accountType="owner" /> },

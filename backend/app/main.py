@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, catalog, health, users
+from app.api.routes import auth, catalog, health, stays, users
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import RequestContextMiddleware, configure_logging
@@ -69,7 +69,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.rate_limiter = RateLimiter()
     app.state.email_outbox = []  # console email backend keeps recent emails here
     register_exception_handlers(app)
-    for router in (health.router, catalog.router, auth.router, users.router):
+    for router in (health.router, catalog.router, stays.router, auth.router, users.router):
         app.include_router(router, prefix=API_PREFIX)
     return app
 

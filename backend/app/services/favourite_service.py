@@ -40,7 +40,9 @@ class FavouriteService:
         }
 
     async def add(self, user_id: ObjectId, resort_id: ObjectId) -> None:
-        if not await self.resorts.find_one({"_id": resort_id, "status": ResortStatus.PUBLISHED}, {"_id": 1}):
+        if not await self.resorts.find_one(
+            {"_id": resort_id, "status": ResortStatus.PUBLISHED}, {"_id": 1}
+        ):
             raise NotFoundError("Resort not found.")
         await self.favourites.update_one(
             {"user_id": user_id, "resort_id": resort_id},

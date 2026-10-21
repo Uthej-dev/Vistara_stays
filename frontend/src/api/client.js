@@ -39,6 +39,15 @@ function emit(event) {
   for (const fn of listeners) fn(event)
 }
 
+/** Non-secret cookie set by the server alongside the httpOnly refresh cookie. */
+export function hasSessionHint() {
+  return typeof document !== 'undefined' && document.cookie.split('; ').some((c) => c === 'vs_has_session=1')
+}
+
+function clearSessionHint() {
+  if (typeof document !== 'undefined') document.cookie = 'vs_has_session=; Max-Age=0; path=/'
+}
+
 export function refreshSession() {
   if (!refreshPromise) {
     refreshPromise = apiClient
@@ -50,6 +59,7 @@ export function refreshSession() {
       })
       .catch((error) => {
         setAccessToken(null)
+        clearSessionHint()
         emit({ type: 'expired' })
         throw error
       })

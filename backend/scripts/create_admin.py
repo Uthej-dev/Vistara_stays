@@ -30,31 +30,46 @@ async def main(email: str, name: str, password: str) -> None:
         now = now_utc()
         update = {
             "$set": {
-                "name": name, "role": Role.ADMIN, "status": UserStatus.ACTIVE,
-                "email_verified": True, "password_hash": hash_password(password), "updated_at": now,
+                "name": name,
+                "role": Role.ADMIN,
+                "status": UserStatus.ACTIVE,
+                "email_verified": True,
+                "password_hash": hash_password(password),
+                "updated_at": now,
             },
             "$setOnInsert": {"created_at": now},
             # Bump token_version so any existing sessions pick up the new role on next login.
             "$inc": {"token_version": 1},
         }
         await db["users"].update_one({"email": email}, update, upsert=True)
-        await db["audit_logs"].insert_one({
-            "actor_id": None, "actor_role": "system", "action": "user.make_admin",
-            "target_type": "user", "target_id": email, "reason": "scripts.create_admin", "at": now,
-        })
+        await db["audit_logs"].insert_one(
+            {
+                "actor_id": None,
+                "actor_role": "system",
+                "action": "user.make_admin",
+                "target_type": "user",
+                "target_id": email,
+                "reason": "scripts.create_admin",
+                "at": now,
+            }
+        )
         print(f"{'Promoted' if existing else 'Created'} admin: {email}")
     finally:
         await client.close()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--email", required=True)
     parser.add_argument("--name", default="Administrator")
     args = parser.parse_args()
     try:
         email = TypeAdapter(Email).validate_python(args.email)
-        password = TypeAdapter(Password).validate_python(getpass.getpass("Admin password (min 10 chars): "))
+        password = TypeAdapter(Password).validate_python(
+            getpass.getpass("Admin password (min 10 chars): ")
+        )
     except ValidationError as exc:
         raise SystemExit(f"Invalid input: {exc.errors()[0]['msg']}") from exc
     if getpass.getpass("Repeat password: ") != password:

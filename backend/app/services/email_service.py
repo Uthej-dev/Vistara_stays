@@ -67,24 +67,28 @@ class EmailService:
 
     async def send_verification(self, to: str, name: str, token: str) -> None:
         link = self._link(f"/verify-email?token={token}")
-        await self.send(Email(
-            to=to,
-            subject="Verify your email for Vistara Stays",
-            text=f"Hi {name},\n\nConfirm your email address to start booking:\n{link}\n\n"
-                 "This link expires in 24 hours. If you didn't sign up, ignore this email.",
-            tags={"link": link, "kind": "verify_email"},
-        ))
+        await self.send(
+            Email(
+                to=to,
+                subject="Verify your email for Vistara Stays",
+                text=f"Hi {name},\n\nConfirm your email address to start booking:\n{link}\n\n"
+                "This link expires in 24 hours. If you didn't sign up, ignore this email.",
+                tags={"link": link, "kind": "verify_email"},
+            )
+        )
 
     async def send_password_reset(self, to: str, name: str, token: str) -> None:
         link = self._link(f"/reset-password?token={token}")
-        await self.send(Email(
-            to=to,
-            subject="Reset your Vistara Stays password",
-            text=f"Hi {name},\n\nReset your password here:\n{link}\n\n"
-                 "This link expires in 30 minutes and can be used once. "
-                 "If you didn't ask for this, you can ignore this email.",
-            tags={"link": link, "kind": "reset_password"},
-        ))
+        await self.send(
+            Email(
+                to=to,
+                subject="Reset your Vistara Stays password",
+                text=f"Hi {name},\n\nReset your password here:\n{link}\n\n"
+                "This link expires in 30 minutes and can be used once. "
+                "If you didn't ask for this, you can ignore this email.",
+                tags={"link": link, "kind": "reset_password"},
+            )
+        )
 
     async def send_notification(self, to: str, subject: str, text: str, kind: str) -> None:
         await self.send(Email(to=to, subject=subject, text=text, tags={"kind": kind}))

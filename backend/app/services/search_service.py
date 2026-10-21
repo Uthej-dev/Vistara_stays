@@ -69,6 +69,13 @@ class SearchService:
             return self._response([], p, 0, applied, {})
 
         facets = await self.resorts.facets(query)
+        if p.has_dates:
+            # Prices and availability depend on inventory for those dates.
+            from app.services.availability_service import AvailabilityService
+
+            return await AvailabilityService(self.db).search_with_dates(
+                p, query, applied, facets, self._response
+            )
         total = await self.resorts.count(query)
         skip = (p.page - 1) * p.page_size
         docs = await self.resorts.search_page(query, p.sort, skip, p.page_size)

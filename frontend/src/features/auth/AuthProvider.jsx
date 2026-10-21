@@ -1,13 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import * as authApi from '../../api/auth'
-import { onSessionChange, refreshSession, setAccessToken } from '../../api/client'
+import { hasSessionHint, onSessionChange, refreshSession, setAccessToken } from '../../api/client'
 
 const AuthContext = createContext(null)
 
 /**
- * Holds the signed-in user. On page load it silently calls /auth/refresh: if the browser has a
- * valid refresh cookie the user is restored without logging in again.
+ * Holds the signed-in user. If the browser may have a session (non-secret hint cookie), it
+ * silently calls /auth/refresh on page load and restores the user without logging in again.
  * status: 'loading' → 'authenticated' | 'anonymous'
  */
 export function AuthProvider({ children }) {
@@ -31,9 +31,14 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let cancelled = false
-    refreshSession()
-      .then((data) => !cancelled && signIn(data))
-      .catch(() => !cancelled && setState({ status: 'anonymous', user: null }))
+    if (hasSessionHint()) {
+      refreshSession()
+        .then((data) => !cancelled && signIn(data))
+        .catch(() => !cancelled && setState({ status: 'anonymous', user: null }))
+    } else {
+      // No session hint cookie: skip the refresh call entirely for anonymous visitors.
+      setState({ status: 'anonymous', user: null })
+    }
     const unsubscribe = onSessionChange((event) => {
       if (event.type === 'refreshed') setState({ status: 'authenticated', user: event.data.user })
       if (event.type === 'expired') signOutLocally()

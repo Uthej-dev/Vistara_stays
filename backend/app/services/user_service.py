@@ -44,7 +44,9 @@ class UserService:
         if user["role"] == Role.OWNER and await self.db["resorts"].count_documents(
             {"owner_id": user["_id"], "status": {"$ne": "archived"}}, limit=1
         ):
-            raise ConflictError("Archive your properties before deleting your account.", code="HAS_PROPERTIES")
+            raise ConflictError(
+                "Archive your properties before deleting your account.", code="HAS_PROPERTIES"
+            )
         uid = str(user["_id"])
         await self.users.update_one(
             {"_id": user["_id"]},

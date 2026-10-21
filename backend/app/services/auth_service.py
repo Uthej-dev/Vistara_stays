@@ -73,17 +73,19 @@ class AuthService:
     async def _new_session(self, user: dict, meta: dict, family_id: str | None = None) -> str:
         token = new_opaque_token()
         now = now_utc()
-        await self.sessions.insert_one({
-            "user_id": user["_id"],
-            "token_hash": hash_token(token),
-            "family_id": family_id or uuid.uuid4().hex,
-            "created_at": now,
-            "last_used_at": now,
-            "expires_at": now + timedelta(days=self.settings.refresh_token_ttl_days),
-            "revoked_at": None,
-            "user_agent": (meta.get("user_agent") or "")[:200],
-            "ip": meta.get("ip"),
-        })
+        await self.sessions.insert_one(
+            {
+                "user_id": user["_id"],
+                "token_hash": hash_token(token),
+                "family_id": family_id or uuid.uuid4().hex,
+                "created_at": now,
+                "last_used_at": now,
+                "expires_at": now + timedelta(days=self.settings.refresh_token_ttl_days),
+                "revoked_at": None,
+                "user_agent": (meta.get("user_agent") or "")[:200],
+                "ip": meta.get("ip"),
+            }
+        )
         return token
 
     async def _issue(self, user: dict, meta: dict, family_id: str | None = None) -> dict:
@@ -100,14 +102,16 @@ class AuthService:
         token = new_opaque_token()
         # Only the newest link of each kind works.
         await self.tokens.delete_many({"user_id": user_id, "purpose": purpose})
-        await self.tokens.insert_one({
-            "user_id": user_id,
-            "purpose": purpose,
-            "token_hash": hash_token(token),
-            "created_at": now_utc(),
-            "expires_at": now_utc() + ttl,
-            "used_at": None,
-        })
+        await self.tokens.insert_one(
+            {
+                "user_id": user_id,
+                "purpose": purpose,
+                "token_hash": hash_token(token),
+                "created_at": now_utc(),
+                "expires_at": now_utc() + ttl,
+                "used_at": None,
+            }
+        )
         return token
 
     async def _consume_token(self, token: str, purpose: str) -> dict:

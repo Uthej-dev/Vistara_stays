@@ -29,6 +29,9 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 REFRESH_COOKIE = "vs_refresh"
 COOKIE_PATH = "/api/v1/auth"
+# Not secret: just tells the frontend a session *may* exist, so anonymous visitors don't make a
+# pointless /auth/refresh call (and get a 401) on every page load.
+SESSION_HINT_COOKIE = "vs_has_session"
 
 
 def get_email_service(request: Request) -> EmailService:
@@ -57,11 +60,27 @@ def set_refresh_cookie(response: Response, token: str, settings: Settings) -> No
         samesite="lax",
         path=COOKIE_PATH,
     )
+    response.set_cookie(
+        SESSION_HINT_COOKIE,
+        "1",
+        max_age=settings.refresh_token_ttl_days * 86400,
+        httponly=False,
+        secure=settings.cookie_secure,
+        samesite="lax",
+        path="/",
+    )
 
 
 def clear_refresh_cookie(response: Response, settings: Settings) -> None:
     response.delete_cookie(
-        REFRESH_COOKIE, path=COOKIE_PATH, secure=settings.cookie_secure, httponly=True, samesite="lax"
+        REFRESH_COOKIE,
+        path=COOKIE_PATH,
+        secure=settings.cookie_secure,
+        httponly=True,
+        samesite="lax",
+    )
+    response.delete_cookie(
+        SESSION_HINT_COOKIE, path="/", secure=settings.cookie_secure, samesite="lax"
     )
 
 
@@ -88,7 +107,11 @@ def _respond(result: dict, response: Response, settings: Settings) -> dict:
     dependencies=[rate_limit("signup", 5, 60)],
 )
 async def signup(
-    body: SignupRequest, request: Request, response: Response, svc: AuthServiceDep, settings: SettingsDep
+    body: SignupRequest,
+    request: Request,
+    response: Response,
+    svc: AuthServiceDep,
+    settings: SettingsDep,
 ):
     """Create a customer or owner account and sign in. A verification email is sent."""
     return _respond(await svc.signup(body, request_meta(request)), response, settings)
@@ -96,9 +119,15 @@ async def signup(
 
 @router.post("/login", response_model=AuthResponse, dependencies=[rate_limit("login", 10, 60)])
 async def login(
-    body: LoginRequest, request: Request, response: Response, svc: AuthServiceDep, settings: SettingsDep
+    body: LoginRequest,
+    request: Request,
+    response: Response,
+    svc: AuthServiceDep,
+    settings: SettingsDep,
 ):
-    return _respond(await svc.login(body.email, body.password, request_meta(request)), response, settings)
+    return _respond(
+        await svc.login(body.email, body.password, request_meta(request)), response, settings
+    )
 
 
 @router.post(
@@ -172,5 +201,7 @@ async def change_password(
     settings: SettingsDep,
 ):
     """Change password; signs out other devices but keeps this one signed in."""
-    result = await svc.change_password(user, body.current_password, body.new_password, request_meta(request))
+    result = await svc.change_password(
+        user, body.current_password, body.new_password, request_meta(request)
+    )
     return _respond(result, response, settings)

@@ -6,6 +6,8 @@ import { apiClient } from '../api/client'
  */
 export function fakeServer(routes) {
   const calls = []
+  // The app only tries to restore a session when the server's hint cookie is present.
+  if (routes['POST /auth/refresh']) document.cookie = 'vs_has_session=1; path=/'
   apiClient.defaults.adapter = async (config) => {
     const key = `${config.method.toUpperCase()} ${config.url}`
     calls.push({ key, config, data: config.data ? JSON.parse(config.data) : undefined })

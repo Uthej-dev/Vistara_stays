@@ -7,8 +7,16 @@ from app.models.enums import Role
 from app.schemas.common import APIModel
 
 COMMON_PASSWORDS = {
-    "password123", "password1234", "qwertyuiop", "1234567890", "iloveyou12",
-    "letmein1234", "welcome1234", "admin12345", "abc1234567", "passw0rd123",
+    "password123",
+    "password1234",
+    "qwertyuiop",
+    "1234567890",
+    "iloveyou12",
+    "letmein1234",
+    "welcome1234",
+    "admin12345",
+    "abc1234567",
+    "passw0rd123",
 }
 
 
