@@ -15,7 +15,7 @@ A phase is **done** only when its exit criteria pass. Status is updated at the e
 | 9 | Admin dashboard, reviews, moderation | Review eligibility + duplicate tests; moderation recomputes ratings; audit log entries for every admin mutation | ✅ Done (2026-10-18) — 25 review/admin tests; review + 8 admin pages verified in Chrome; 170 labelled sample reviews seeded deterministically |
 | 10 | Payments (simulated → Razorpay test), notifications | Signature verification tests with known vectors; webhook idempotency; no "paid" from redirect alone | ✅ Done (2026-10-18) — 10 Razorpay tests against a fake Razorpay API (mutation-checked); live test mode needs your Razorpay test keys |
 | 11 | Full test pass, security review, E2E checklist | All suites green; coverage report; manual checklist signed off; security checklist | ✅ Done (2026-10-18) — 222 backend (92% coverage) + 79 frontend tests, 9/9 browser journeys, lint clean, 0 known vulnerabilities; see docs/09 |
-| 12 | Deployment + README | Live URLs; production CORS/cookies verified; README with screenshots & limitations | ⏳ |
+| 12 | Deployment + README | Live URLs; production CORS/cookies verified; README with screenshots & limitations | 🟡 Ready to deploy (2026-10-18): render.yaml, vercel.json (+CSP), CI workflow, deployment guide, README with screenshots. Production build + CSP verified locally (9/9 journeys, Lighthouse a11y 100). **Live URLs need your GitHub/Render/Vercel/Cloudinary accounts — follow docs/11.** |
 
 ## Decisions (2026-10-17)
 

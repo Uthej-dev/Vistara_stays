@@ -7,7 +7,7 @@ import Button from '../../components/ui/Button'
 
 export function FullPageSpinner() {
   return (
-    <div role="status" className="grid min-h-[50vh] place-items-center text-forest-700">
+    <div role="status" className="grid min-h-[100svh] place-items-center text-forest-700">
       <Spinner className="size-6" />
       <span className="sr-only">Loading…</span>
     </div>

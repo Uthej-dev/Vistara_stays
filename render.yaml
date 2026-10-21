@@ -1,0 +1,58 @@
+# Render Blueprint for the API (https://render.com/docs/blueprint-spec).
+# In Render: New → Blueprint → pick this repo. Secrets marked `sync: false` are entered in the
+# dashboard (never committed). See docs/10-deployment.md.
+services:
+  - type: web
+    name: vistara-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    # --proxy-headers: trust X-Forwarded-* from Render's proxy so client IPs and https are correct.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: APP_ENV
+        value: production
+      - key: MONGODB_DB
+        value: vistara_prod
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: ENABLE_DOCS
+        value: "true"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: IMAGE_STORAGE
+        value: cloudinary
+      - key: PAYMENT_PROVIDER
+        value: simulated
+      - key: EMAIL_BACKEND
+        value: console
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false

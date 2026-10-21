@@ -187,6 +187,7 @@ export default function SearchPage() {
               </EmptyState>
             ) : (
               <>
+                <h2 className="sr-only">Results</h2>
                 <ul className={`grid gap-5 sm:grid-cols-2 xl:grid-cols-3 transition-opacity ${isFetching ? 'opacity-60' : ''}`}>
                   {data.items.map((r) => (
                     <li key={r.id} className="flex">

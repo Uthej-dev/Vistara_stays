@@ -1,0 +1,53 @@
+# Runs on every push and pull request: backend tests against a real MongoDB replica set,
+# frontend lint + tests + production build, and dependency audits.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      TEST_MONGODB_URI: mongodb://localhost:27017/?replicaSet=rs0
+    steps:
+      - uses: actions/checkout@v7
+      - name: Start MongoDB (single-node replica set, needed for transactions)
+        uses: supercharge/mongodb-github-action@1.12.1
+        with:
+          mongodb-version: "7.0"
+          mongodb-replica-set: rs0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check . && ruff format --check .
+      - run: pytest --cov=app --cov-report=term-missing
+      - run: pip-audit -r requirements.txt
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=high

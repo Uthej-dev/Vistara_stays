@@ -67,10 +67,14 @@ export default function ResortPage() {
   if (error?.response?.status === 404) return <NotFoundPage />
   if (error) return <ErrorState className="m-8" error={error} onRetry={refetch} />
   if (isPending) {
+    // Same shape as the loaded page (banner, title, rating, gallery) so nothing jumps when data arrives.
     return (
-      <Container className="py-10">
-        <Skeleton className="h-10 w-2/3" />
-        <Skeleton className="mt-6 aspect-[16/7] w-full rounded-3xl" />
+      <Container className="min-h-[100svh] pt-8" aria-busy="true">
+        <Skeleton className="h-11 w-full rounded-xl" />
+        <Skeleton className="mt-4 h-5 w-48" />
+        <Skeleton className="mt-2 h-12 w-2/3" />
+        <Skeleton className="mt-3 h-6 w-40" />
+        <Skeleton className="mt-6 aspect-[16/10] w-full rounded-3xl sm:aspect-auto sm:h-[428px]" />
       </Container>
     )
   }

@@ -36,8 +36,8 @@ modern browsers increasingly block). In local development, Vite's dev-server pro
 | Validation | **Pydantic v2** + `pydantic-settings` | Schemas for requests/responses; typed config from env vars. |
 | Password hashing | **Argon2id** via `pwdlib[argon2]` | Modern memory-hard algorithm; library recommended in current FastAPI docs. |
 | JWT | **PyJWT** | Small, maintained, HS256 signing. |
-| Rate limiting | **slowapi** | Simple decorator-based limits. In-memory store (fine for one Render instance; Redis needed if scaled out — documented limitation). |
-| Images | **Cloudinary** (signed direct upload) | Free tier, on-the-fly resizing (`w_800,f_auto,q_auto`), no binaries in MongoDB. |
+| Rate limiting | Small built-in fixed-window limiter (`app/core/rate_limit.py`) | FastAPI dependency, easy to test. In-memory store (fine for one Render instance; Redis needed if scaled out — documented limitation). |
+| Images | **Cloudinary** (server-side signed upload; local disk in development) | Files are validated on our server first (content sniffing, size cap), then stored; Cloudinary serves resized WebP/AVIF from a CDN. No binaries in MongoDB. |
 | Email | Console backend (dev) / **Resend** (prod) | Swappable via `EMAIL_BACKEND` env var. |
 | Payments | **Razorpay** test mode (Phase 10) | India-focused, good test mode, webhook signatures. |
 | Frontend | **React + Vite**, React Router, Tailwind CSS, Lucide icons | Requested stack. |
@@ -46,7 +46,7 @@ modern browsers increasingly block). In local development, Vite's dev-server pro
 | HTTP | **Axios** with interceptors | Attaches access token, transparently refreshes on 401 once. |
 | Tests | Pytest + HTTPX `AsyncClient`; Vitest + React Testing Library | Requested stack. |
 
-Exact pinned versions are chosen and verified in Phase 2.
+Exact pinned versions live in `backend/requirements*.txt` and `frontend/package.json` (lockfile committed).
 
 ## 3. Backend layering
 
