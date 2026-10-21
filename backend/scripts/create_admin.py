@@ -4,11 +4,13 @@ the API never lets a client choose or change roles.
 Usage (from backend/, venv active):
     python -m scripts.create_admin --email admin@example.com --name "Site Admin"
 You'll be prompted for the password (it is never passed on the command line).
+Automation:  printf '%s\n' "$ADMIN_PASSWORD" | python -m scripts.create_admin --email ... --password-stdin
 """
 
 import argparse
 import asyncio
 import getpass
+import sys
 
 from pydantic import TypeAdapter, ValidationError
 
@@ -64,14 +66,21 @@ if __name__ == "__main__":
     )
     parser.add_argument("--email", required=True)
     parser.add_argument("--name", default="Administrator")
+    parser.add_argument(
+        "--password-stdin",
+        action="store_true",
+        help="read the password from standard input (automation); never pass it as an argument",
+    )
     args = parser.parse_args()
     try:
         email = TypeAdapter(Email).validate_python(args.email)
-        password = TypeAdapter(Password).validate_python(
-            getpass.getpass("Admin password (min 10 chars): ")
-        )
+        if args.password_stdin:
+            raw = sys.stdin.readline().rstrip("\n")
+        else:
+            raw = getpass.getpass("Admin password (min 10 chars): ")
+        password = TypeAdapter(Password).validate_python(raw)
     except ValidationError as exc:
         raise SystemExit(f"Invalid input: {exc.errors()[0]['msg']}") from exc
-    if getpass.getpass("Repeat password: ") != password:
+    if not args.password_stdin and getpass.getpass("Repeat password: ") != password:
         raise SystemExit("Passwords don't match.")
     asyncio.run(main(email, args.name, password))

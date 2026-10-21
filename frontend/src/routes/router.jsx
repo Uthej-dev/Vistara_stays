@@ -14,14 +14,19 @@ import AccountPage from '../pages/AccountPage'
 import FavouritesPage from '../pages/FavouritesPage'
 import RequireAuth from '../features/auth/RequireAuth'
 import ResortPage from '../pages/ResortPage'
+import OwnersLandingPage from '../pages/OwnersLandingPage'
+import OwnerShell from '../features/owner/OwnerShell'
+import OwnerDashboardPage from '../pages/owner/OwnerDashboardPage'
+import OwnerResortsPage from '../pages/owner/OwnerResortsPage'
+import ResortEditorPage from '../pages/owner/ResortEditorPage'
+import OwnerCalendarPage from '../pages/owner/OwnerCalendarPage'
+import { OwnerBookingPage, OwnerBookingsPage, OwnerEnquiriesPage } from '../pages/owner/OwnerBookingsPages'
 import CheckoutPage from '../pages/booking/CheckoutPage'
 import PaymentPage from '../pages/booking/PaymentPage'
 import { TripPage, TripsPage } from '../pages/booking/TripsPages'
 
 // Routes that later phases implement. Listed here so every link in the UI resolves.
 const UPCOMING = [
-  { path: 'owners', title: 'List your property', phase: 8 },
-  { path: 'owner', title: 'Owner dashboard', phase: 8 },
   { path: 'help', title: 'Help centre', phase: 11 },
   { path: 'help/cancellations', title: 'Cancellations & refunds', phase: 11 },
   { path: 'contact', title: 'Contact us', phase: 11 },
@@ -40,6 +45,7 @@ export const routes = [
       { path: 'destinations', element: <DestinationsPage /> },
       { path: 'destinations/:slug', element: <DestinationPage /> },
       { path: 'resorts/:slug', element: <ResortPage /> },
+      { path: 'owners', element: <OwnersLandingPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignupPage /> },
       { path: 'owners/register', element: <SignupPage accountType="owner" /> },
@@ -49,6 +55,23 @@ export const routes = [
       {
         element: <RequireAuth />,
         children: [{ path: 'account', element: <AccountPage /> }],
+      },
+      {
+        path: 'owner',
+        element: (
+          <RequireAuth roles={['owner']}>
+            <OwnerShell />
+          </RequireAuth>
+        ),
+        children: [
+          { index: true, element: <OwnerDashboardPage /> },
+          { path: 'resorts', element: <OwnerResortsPage /> },
+          { path: 'resorts/:resortId', element: <ResortEditorPage /> },
+          { path: 'calendar', element: <OwnerCalendarPage /> },
+          { path: 'bookings', element: <OwnerBookingsPage /> },
+          { path: 'bookings/:bookingId', element: <OwnerBookingPage /> },
+          { path: 'enquiries', element: <OwnerEnquiriesPage /> },
+        ],
       },
       {
         element: <RequireAuth roles={['customer']} />,

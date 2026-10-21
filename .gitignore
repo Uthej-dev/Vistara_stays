@@ -25,3 +25,6 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 .mongo-test/
+
+# Local image uploads (development)
+backend/media/

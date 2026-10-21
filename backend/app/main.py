@@ -8,11 +8,13 @@ Uvicorn serves.
 import asyncio
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
-from app.api.routes import auth, bookings, catalog, health, stays, users
+from app.api.routes import admin, auth, bookings, catalog, health, owner, stays, uploads, users
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import RequestContextMiddleware, configure_logging
@@ -106,8 +108,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         bookings.router,
         auth.router,
         users.router,
+        owner.router,
+        uploads.router,
+        admin.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
+    if settings.image_storage == "local":
+        # Development only: serve uploaded images. Production uses Cloudinary.
+        media = Path(settings.media_dir)
+        media.mkdir(parents=True, exist_ok=True)
+        app.mount(f"{API_PREFIX}/media", StaticFiles(directory=media), name="media")
     return app
 
 
