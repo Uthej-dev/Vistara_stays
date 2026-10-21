@@ -34,10 +34,6 @@ def verify_password(password: str, password_hash: str | None) -> tuple[bool, str
     return _password_hash.verify_and_update(password, password_hash)
 
 
-# A real Argon2 hash used to equalise timing for unknown emails during login.
-DUMMY_PASSWORD_HASH = _password_hash.hash("not-a-real-password-" + secrets.token_hex(8))
-
-
 def create_access_token(
     *, user_id: str, role: str, token_version: int, secret: str, ttl_minutes: int
 ) -> tuple[str, int]:

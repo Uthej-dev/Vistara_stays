@@ -450,17 +450,17 @@ ROOM_TEMPLATES = {
 
 SAMPLE_OWNERS = [
     {
-        "email": "owner.western-ghats@vistara.test",
+        "email": "owner.westernghats@example.com",
         "name": "Sample Owner — Western Ghats Stays",
         "business_name": "Western Ghats Stays (fictional)",
     },
     {
-        "email": "owner.coastal@vistara.test",
+        "email": "owner.coastal@example.com",
         "name": "Sample Owner — Coastal Retreats",
         "business_name": "Coastal Retreats (fictional)",
     },
     {
-        "email": "owner.deccan@vistara.test",
+        "email": "owner.deccan@example.com",
         "name": "Sample Owner — Deccan Hospitality",
         "business_name": "Deccan Hospitality (fictional)",
     },

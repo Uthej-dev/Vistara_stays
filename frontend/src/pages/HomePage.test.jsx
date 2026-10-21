@@ -1,23 +1,11 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { RouterProvider, createMemoryRouter } from 'react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { routes } from '../routes/router'
+import { renderApp } from '../test/renderApp'
 
 vi.mock('../api/catalog', () => import('../test/mockCatalogApi'))
 vi.mock('../api/health', () => ({ getReadiness: vi.fn(async () => ({ status: 'ok', database: 'ok' })) }))
 
-function renderApp(path = '/') {
-  const router = createMemoryRouter(routes, { initialEntries: [path] })
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  )
-  return router
-}
 
 describe('HomePage', () => {
   it('renders every landing-page section', async () => {

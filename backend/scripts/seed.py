@@ -160,7 +160,7 @@ async def seed_users(db, password_hash: str) -> list[dict]:
         )
     await upsert(
         db["users"],
-        {"email": "demo.customer@vistara.test"},
+        {"email": "demo.customer@example.com"},
         {
             "name": "Demo Customer",
             "role": Role.CUSTOMER,
@@ -358,7 +358,7 @@ async def main(reset: bool) -> None:
         )
         print(
             f"Sample logins (password: {'SEED_PASSWORD' if 'SEED_PASSWORD' in os.environ else DEFAULT_SEED_PASSWORD}): "
-            "demo.customer@vistara.test, " + ", ".join(o["email"] for o in SAMPLE_OWNERS)
+            "demo.customer@example.com, " + ", ".join(o["email"] for o in SAMPLE_OWNERS)
         )
     finally:
         await client.close()

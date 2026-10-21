@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createMemoryRouter, RouterProvider, useLocation } from 'react-router'
+import { AuthProvider } from '../features/auth/AuthProvider'
 
 /** Shows the current URL so tests can assert where navigation went. */
 export function LocationDisplay() {
@@ -25,7 +26,9 @@ export function renderWithRouter(ui, { initialPath = '/' } = {}) {
     router,
     ...render(
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
       </QueryClientProvider>,
     ),
   }

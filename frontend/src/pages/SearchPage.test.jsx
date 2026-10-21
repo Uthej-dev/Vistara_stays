@@ -1,31 +1,19 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { RouterProvider, createMemoryRouter } from 'react-router'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { routes } from '../routes/router'
+import { renderApp } from '../test/renderApp'
 import * as api from '../api/catalog'
 import { searchResponse } from '../test/fixtures'
 
 vi.mock('../api/catalog', () => import('../test/mockCatalogApi'))
 vi.mock('../api/health', () => ({ getReadiness: vi.fn(async () => ({ status: 'ok', database: 'ok' })) }))
 
-function renderSearch(path) {
-  const router = createMemoryRouter(routes, { initialEntries: [path] })
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  )
-  return router
-}
 
 describe('SearchPage', () => {
   beforeEach(() => vi.mocked(api.searchResorts).mockClear())
 
   it('sends URL parameters to the API and shows results', async () => {
-    renderSearch('/search?destination=coorg&amenity=pool&amenity=wifi&sort=price_asc')
+    renderApp('/search?destination=coorg&amenity=pool&amenity=wifi&sort=price_asc')
 
     expect(await screen.findByRole('heading', { name: 'Stays in Coorg' })).toBeInTheDocument()
     expect(await screen.findByRole('link', { name: 'Misty Fern Estate Stay' })).toBeInTheDocument()
@@ -36,7 +24,7 @@ describe('SearchPage', () => {
 
   it('turns a filter click into a URL change and a new search', async () => {
     const user = userEvent.setup()
-    const router = renderSearch('/search?destination=coorg&page=2')
+    const { router } = renderApp('/search?destination=coorg&page=2')
     const filters = await screen.findByRole('complementary', { name: 'Filters' })
 
     await user.click(await within(filters).findByRole('checkbox', { name: 'Swimming pool' }))
@@ -47,7 +35,7 @@ describe('SearchPage', () => {
 
   it('shows applied filters as chips with a clear-all option', async () => {
     const user = userEvent.setup()
-    const router = renderSearch('/search?amenity=pool&min_rating=4&q=mist')
+    const { router } = renderApp('/search?amenity=pool&min_rating=4&q=mist')
     const chips = await screen.findByRole('list', { name: 'Applied filters' })
 
     expect(await within(chips).findByRole('button', { name: 'Remove filter: Swimming pool' })).toBeInTheDocument()
@@ -59,7 +47,7 @@ describe('SearchPage', () => {
 
   it('shows a helpful empty state', async () => {
     vi.mocked(api.searchResorts).mockResolvedValueOnce(searchResponse([]))
-    renderSearch('/search?amenity=pool')
+    renderApp('/search?amenity=pool')
 
     expect(await screen.findByRole('heading', { name: 'No stays match your search' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument()
@@ -68,7 +56,7 @@ describe('SearchPage', () => {
   it('paginates through results', async () => {
     const user = userEvent.setup()
     vi.mocked(api.searchResorts).mockResolvedValue(searchResponse(undefined, { total: 30, total_pages: 3 }))
-    const router = renderSearch('/search')
+    const { router } = renderApp('/search')
 
     await user.click(await screen.findByRole('button', { name: 'Page 2' }))
 

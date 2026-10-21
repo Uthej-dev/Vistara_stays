@@ -7,16 +7,18 @@ import DestinationsPage from '../pages/DestinationsPage'
 import DestinationPage from '../pages/DestinationPage'
 import ComingSoonPage from '../pages/ComingSoonPage'
 import NotFoundPage from '../pages/NotFoundPage'
+import LoginPage from '../pages/auth/LoginPage'
+import SignupPage from '../pages/auth/SignupPage'
+import { ForgotPasswordPage, ResetPasswordPage, VerifyEmailPage } from '../pages/auth/PasswordPages'
+import AccountPage from '../pages/AccountPage'
+import FavouritesPage from '../pages/FavouritesPage'
+import RequireAuth from '../features/auth/RequireAuth'
 
 // Routes that later phases implement. Listed here so every link in the UI resolves.
 const UPCOMING = [
   { path: 'resorts/:slug', title: 'Resort details', phase: 6 },
-  { path: 'login', title: 'Log in', phase: 5 },
-  { path: 'signup', title: 'Create an account', phase: 5 },
-  { path: 'favourites', title: 'Your favourites', phase: 5 },
   { path: 'trips', title: 'Your trips', phase: 7 },
   { path: 'owners', title: 'List your property', phase: 8 },
-  { path: 'owners/register', title: 'Create an owner account', phase: 8 },
   { path: 'owner', title: 'Owner dashboard', phase: 8 },
   { path: 'help', title: 'Help centre', phase: 11 },
   { path: 'help/cancellations', title: 'Cancellations & refunds', phase: 11 },
@@ -35,6 +37,20 @@ export const routes = [
       { path: 'credits', element: <CreditsPage /> },
       { path: 'destinations', element: <DestinationsPage /> },
       { path: 'destinations/:slug', element: <DestinationPage /> },
+      { path: 'login', element: <LoginPage /> },
+      { path: 'signup', element: <SignupPage /> },
+      { path: 'owners/register', element: <SignupPage accountType="owner" /> },
+      { path: 'forgot-password', element: <ForgotPasswordPage /> },
+      { path: 'reset-password', element: <ResetPasswordPage /> },
+      { path: 'verify-email', element: <VerifyEmailPage /> },
+      {
+        element: <RequireAuth />,
+        children: [{ path: 'account', element: <AccountPage /> }],
+      },
+      {
+        element: <RequireAuth roles={['customer']} />,
+        children: [{ path: 'favourites', element: <FavouritesPage /> }],
+      },
       ...UPCOMING.map(({ path, title, phase }) => ({
         path,
         element: <ComingSoonPage title={title} phase={phase} />,

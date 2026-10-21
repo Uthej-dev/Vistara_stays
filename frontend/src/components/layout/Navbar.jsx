@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router'
 import { Building2, Heart, Menu, User, X } from 'lucide-react'
 import Logo from './Logo'
+import UserMenu, { menuLinksFor } from './UserMenu'
+import { useAuth } from '../../features/auth/AuthProvider'
 import { cn } from '../../utils/cn'
 
 const LINKS = [
@@ -15,6 +17,7 @@ const LINKS = [
  * Profile/avatar menu replaces "Log in" once authentication exists (Phase 5).
  */
 export default function Navbar({ overlay = false }) {
+  const { user, status, logout } = useAuth()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
@@ -72,18 +75,20 @@ export default function Navbar({ overlay = false }) {
             <Building2 className="size-4" aria-hidden="true" />
             List your property
           </NavLink>
-          <NavLink
-            to="/login"
-            className={cn(
-              'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
-              transparent
-                ? 'bg-cream-50 text-forest-900 hover:bg-white'
-                : 'bg-forest-800 text-cream-50 hover:bg-forest-700',
-            )}
-          >
-            <User className="size-4" aria-hidden="true" />
-            Log in
-          </NavLink>
+          {status === 'authenticated' ? (
+            <UserMenu user={user} onLogout={logout} transparent={transparent} />
+          ) : (
+            <NavLink
+              to="/login"
+              className={cn(
+                'flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors',
+                transparent ? 'bg-cream-50 text-forest-900 hover:bg-white' : 'bg-forest-800 text-cream-50 hover:bg-forest-700',
+              )}
+            >
+              <User className="size-4" aria-hidden="true" />
+              Log in
+            </NavLink>
+          )}
         </div>
 
         <button
@@ -109,13 +114,28 @@ export default function Navbar({ overlay = false }) {
               </li>
             ))}
           </ul>
-          <NavLink
-            to="/login"
-            className="flex h-11 items-center justify-center gap-2 rounded-full bg-forest-800 font-semibold text-cream-50"
-          >
-            <User className="size-4" aria-hidden="true" />
-            Log in or sign up
-          </NavLink>
+          {status === 'authenticated' ? (
+            <div className="border-t border-forest-900/10 pt-3">
+              <p className="px-2 pb-2 text-sm text-ink-600">Signed in as {user.name}</p>
+              <ul>
+                {menuLinksFor(user).map(({ to, label }) => (
+                  <li key={to}>
+                    <NavLink to={to} className="block rounded-lg px-2 py-3 font-medium text-ink-900 hover:bg-forest-100">
+                      {label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+              <button type="button" onClick={logout} className="mt-2 h-11 w-full rounded-full font-semibold text-clay-600 ring-1 ring-clay-600/30">
+                Log out
+              </button>
+            </div>
+          ) : (
+            <NavLink to="/login" className="flex h-11 items-center justify-center gap-2 rounded-full bg-forest-800 font-semibold text-cream-50">
+              <User className="size-4" aria-hidden="true" />
+              Log in or sign up
+            </NavLink>
+          )}
         </div>
       )}
     </header>

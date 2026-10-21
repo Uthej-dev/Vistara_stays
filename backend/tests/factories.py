@@ -20,7 +20,7 @@ def unique(prefix: str) -> str:
 
 async def make_user(db, role: Role = Role.CUSTOMER, **overrides) -> dict:
     doc = {
-        "email": f"{unique(role)}@example.test",
+        "email": f"{unique(role)}@example.com",
         "name": "Test User",
         "role": role,
         "status": UserStatus.ACTIVE,
@@ -35,7 +35,7 @@ async def make_user(db, role: Role = Role.CUSTOMER, **overrides) -> dict:
     return doc
 
 
-def auth_headers(user: dict, secret: str = "test-secret-not-for-production") -> dict:
+def auth_headers(user: dict, secret: str = "test-secret-not-for-production-0123456789") -> dict:
     token, _ = create_access_token(
         user_id=str(user["_id"]),
         role=user["role"],

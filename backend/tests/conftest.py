@@ -15,7 +15,7 @@ os.environ.update(
         "APP_ENV": "test",
         "MONGODB_URI": TEST_MONGODB_URI,
         "MONGODB_DB": "vistara_test",
-        "JWT_SECRET": "test-secret-not-for-production",
+        "JWT_SECRET": "test-secret-not-for-production-0123456789",
         "CORS_ORIGINS": "http://localhost:5173",
         "LOG_LEVEL": "WARNING",
     }
@@ -68,8 +68,10 @@ def make_settings(**overrides) -> Settings:
         "app_env": "test",
         "mongodb_uri": TEST_MONGODB_URI,
         "mongodb_db": TEST_DB_NAME,
-        "jwt_secret": "test-secret-not-for-production",
+        "jwt_secret": "test-secret-not-for-production-0123456789",
         "ensure_indexes_on_startup": False,
+        "rate_limit_enabled": False,  # specific tests turn it on
+        "maintenance_interval_seconds": 0,
         "log_level": "WARNING",
     }
     return Settings(**(base | overrides))
@@ -98,3 +100,30 @@ async def client(app):
 @pytest.fixture
 def db(app):
     return app.state.db
+
+
+@pytest.fixture
+def outbox(app):
+    """Emails "sent" by the console email backend during the test."""
+    return app.state.email_outbox
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _ensure_test_indexes():
+    """Unique indexes are part of the behaviour under test (duplicate emails, idempotency...)."""
+    if not MONGO_AVAILABLE:
+        return
+    import asyncio
+
+    from pymongo import AsyncMongoClient
+
+    from app.db.indexes import ensure_indexes
+
+    async def run():
+        client = AsyncMongoClient(TEST_MONGODB_URI)
+        try:
+            await ensure_indexes(client[TEST_DB_NAME])
+        finally:
+            await client.close()
+
+    asyncio.run(run())

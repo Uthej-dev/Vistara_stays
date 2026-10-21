@@ -3,7 +3,7 @@
 import pytest
 
 from scripts import seed
-from tests.factories import make_listing, make_user
+from tests.factories import make_listing
 
 pytestmark = pytest.mark.db
 
@@ -204,8 +204,6 @@ async def test_featured_resorts_come_from_seed_ranking(client, seeded):
 
 
 async def test_sample_owner_accounts_are_marked_sample(db, seeded):
-    owners = (
-        await db["users"].find({"role": "owner", "email": {"$regex": "@vistara.test$"}}).to_list(10)
-    )
-    assert owners and all(o["is_sample"] for o in owners)
-    _ = await make_user(db)  # sanity: factories work alongside seed data
+    emails = [o["email"] for o in seed.SAMPLE_OWNERS]
+    owners = await db["users"].find({"email": {"$in": emails}}).to_list(10)
+    assert len(owners) == 3 and all(o["is_sample"] for o in owners)
