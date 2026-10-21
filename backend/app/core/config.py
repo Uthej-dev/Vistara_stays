@@ -30,6 +30,36 @@ class Settings(BaseSettings):
     enable_docs: bool = True
     log_level: str = "INFO"
 
+    # Auth
+    access_token_ttl_min: int = Field(15, ge=1, le=120)
+    refresh_token_ttl_days: int = Field(14, ge=1, le=90)
+    cookie_secure: bool = False  # must be True in production (HTTPS only)
+    require_email_verification: bool = True  # verified email needed before booking
+    rate_limit_enabled: bool = True
+
+    # Email: "console" logs emails (development); "resend" sends via the Resend API
+    email_backend: Literal["console", "resend"] = "console"
+    email_from: str = "Vistara Stays <no-reply@vistarastays.example>"
+    resend_api_key: str | None = None
+
+    # Images: "local" stores uploads on disk (development only); "cloudinary" for production
+    image_storage: Literal["local", "cloudinary"] = "local"
+    media_dir: str = "media"
+    public_api_url: str = "http://localhost:8000"
+    cloudinary_cloud_name: str | None = None
+    cloudinary_api_key: str | None = None
+    cloudinary_api_secret: str | None = None
+    max_upload_mb: int = Field(5, ge=1, le=20)
+
+    # Payments: "simulated" (development, clearly labelled) or "razorpay" (test/live keys)
+    payment_provider: Literal["simulated", "razorpay"] = "simulated"
+    razorpay_key_id: str | None = None
+    razorpay_key_secret: str | None = None
+    razorpay_webhook_secret: str | None = None
+
+    # Background maintenance loop (expire holds, complete stays) while the server is awake
+    maintenance_interval_seconds: int = Field(60, ge=0, le=3600)
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def split_origins(cls, value: object) -> object:
@@ -44,6 +74,20 @@ class Settings(BaseSettings):
                 raise ValueError("JWT_SECRET must be a strong random value in production")
             if "*" in self.cors_origins:
                 raise ValueError("CORS_ORIGINS cannot be '*' in production")
+            if not self.cookie_secure:
+                raise ValueError("COOKIE_SECURE must be true in production")
+            if self.image_storage != "cloudinary":
+                raise ValueError("IMAGE_STORAGE must be 'cloudinary' in production")
+        if self.image_storage == "cloudinary" and not all(
+            [self.cloudinary_cloud_name, self.cloudinary_api_key, self.cloudinary_api_secret]
+        ):
+            raise ValueError("IMAGE_STORAGE=cloudinary requires the three CLOUDINARY_* settings")
+        if self.payment_provider == "razorpay" and not all(
+            [self.razorpay_key_id, self.razorpay_key_secret, self.razorpay_webhook_secret]
+        ):
+            raise ValueError("PAYMENT_PROVIDER=razorpay requires the three RAZORPAY_* settings")
+        if self.email_backend == "resend" and not self.resend_api_key:
+            raise ValueError("EMAIL_BACKEND=resend requires RESEND_API_KEY")
         return self
 
     @property

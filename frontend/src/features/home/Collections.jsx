@@ -3,14 +3,15 @@ import { ArrowRight, Leaf } from 'lucide-react'
 import { Section } from '../../components/ui/Section'
 import SmartImage from '../../components/ui/SmartImage'
 import { COLLECTIONS, GUIDES } from '../../data/catalog'
-import { DESTINATIONS_BY_SLUG, destinationsInSeason } from '../../data/destinations'
+import { useDestinationMap } from '../catalog/queries'
 import { currentMonthIST } from '../../utils/dates'
 import { monthName } from '../../utils/format'
 
-/** Curated collections, "in season now" (computed from each destination's best months), and guides. */
+/** Curated collections, "in season now" (from each destination's best months), and guides. */
 export default function Collections() {
+  const { data: destinations = [], map } = useDestinationMap()
   const month = currentMonthIST()
-  const inSeason = destinationsInSeason(month).slice(0, 10)
+  const inSeason = destinations.filter((d) => d.best_months.includes(month)).slice(0, 10)
 
   return (
     <Section
@@ -22,21 +23,23 @@ export default function Collections() {
       <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {COLLECTIONS.map((c) => (
           <li key={c.slug} className="overflow-hidden rounded-2xl bg-forest-800 ring-1 ring-white/5">
-            <SmartImage image={c.cover} alt="" sizes="(min-width: 1024px) 25vw, 50vw" className="aspect-[16/10]" />
+            <SmartImage image={map[c.destinations[0]]?.image} alt="" sizes="(min-width: 1024px) 25vw, 50vw" className="aspect-[16/10]" />
             <div className="p-5">
               <h3 className="font-display text-xl text-cream-50">{c.title}</h3>
               <p className="mt-1 text-sm">{c.description}</p>
               <ul className="mt-4 flex flex-wrap gap-2">
-                {c.destinations.map((slug) => (
-                  <li key={slug}>
-                    <Link
-                      to={`/destinations/${slug}`}
-                      className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs text-cream-50 hover:bg-white/20"
-                    >
-                      {DESTINATIONS_BY_SLUG[slug].name}
-                    </Link>
-                  </li>
-                ))}
+                {c.destinations
+                  .filter((slug) => map[slug])
+                  .map((slug) => (
+                    <li key={slug}>
+                      <Link
+                        to={`/destinations/${slug}`}
+                        className="inline-block rounded-full bg-white/10 px-3 py-1 text-xs text-cream-50 hover:bg-white/20"
+                      >
+                        {map[slug].name}
+                      </Link>
+                    </li>
+                  ))}
               </ul>
             </div>
           </li>
@@ -74,9 +77,9 @@ export default function Collections() {
                 to={`/destinations/${g.destination}`}
                 className="group flex h-full gap-4 rounded-2xl bg-forest-800 p-3 ring-1 ring-white/5 transition-colors hover:bg-forest-700"
               >
-                <SmartImage image={g.image} alt="" sizes="120px" className="aspect-square w-24 shrink-0 rounded-xl sm:w-28" />
+                <SmartImage image={map[g.destination]?.image} alt="" sizes="120px" className="aspect-square w-24 shrink-0 rounded-xl sm:w-28" />
                 <div className="py-1">
-                  <p className="text-xs tracking-wide text-clay-500 uppercase">{g.name}</p>
+                  <p className="text-xs tracking-wide text-clay-500 uppercase">{map[g.destination]?.name}</p>
                   <p className="font-display text-lg text-cream-50">{g.title}</p>
                   <ul className="mt-1 space-y-0.5 text-xs text-cream-100/80">
                     {g.points.map((p) => (

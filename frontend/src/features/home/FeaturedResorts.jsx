@@ -1,10 +1,17 @@
 import { ArrowRight, Info } from 'lucide-react'
 import { Section } from '../../components/ui/Section'
 import Button from '../../components/ui/Button'
-import ResortCard from '../../components/resort/ResortCard'
-import { SAMPLE_RESORTS } from '../../data/sampleResorts'
+import { ErrorState } from '../../components/ui/States'
+import ResortCard, { ResortCardSkeleton } from '../../components/resort/ResortCard'
+import { useFeaturedResorts } from '../catalog/queries'
+import { useAmenityLookup } from '../catalog/useAmenityLookup'
+import { useFavouriteToggle } from '../favourites/useFavouriteToggle'
 
 export default function FeaturedResorts() {
+  const { data, isPending, error, refetch } = useFeaturedResorts()
+  const amenityLookup = useAmenityLookup()
+  const favourites = useFavouriteToggle()
+
   return (
     <Section
       id="featured"
@@ -23,13 +30,23 @@ export default function FeaturedResorts() {
         These are fictional sample properties for demonstration. Photos show the destination, not the property.
         Prices are starting rates per room per night and exclude taxes and fees.
       </p>
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-        {SAMPLE_RESORTS.map((r) => (
-          <li key={r.slug} className="flex">
-            <ResortCard resort={r} />
-          </li>
-        ))}
-      </ul>
+      {error ? (
+        <ErrorState error={error} onRetry={refetch} title="Couldn’t load featured stays" />
+      ) : (
+        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" aria-busy={isPending}>
+          {isPending
+            ? Array.from({ length: 4 }, (_, i) => (
+                <li key={i} className="flex">
+                  <ResortCardSkeleton />
+                </li>
+              ))
+            : data.map((r) => (
+                <li key={r.id} className="flex">
+                  <ResortCard resort={r} amenityLookup={amenityLookup} {...favourites.cardProps(r)} />
+                </li>
+              ))}
+        </ul>
+      )}
     </Section>
   )
 }

@@ -3,13 +3,13 @@ import PublicLayout from '../layouts/PublicLayout'
 import HomePage from '../pages/HomePage'
 import SearchPage from '../pages/SearchPage'
 import CreditsPage from '../pages/CreditsPage'
+import DestinationsPage from '../pages/DestinationsPage'
+import DestinationPage from '../pages/DestinationPage'
 import ComingSoonPage from '../pages/ComingSoonPage'
 import NotFoundPage from '../pages/NotFoundPage'
 
 // Routes that later phases implement. Listed here so every link in the UI resolves.
 const UPCOMING = [
-  { path: 'destinations', title: 'All destinations', phase: 4 },
-  { path: 'destinations/:slug', title: 'Destination guide', phase: 4 },
   { path: 'resorts/:slug', title: 'Resort details', phase: 6 },
   { path: 'login', title: 'Log in', phase: 5 },
   { path: 'signup', title: 'Create an account', phase: 5 },
@@ -33,6 +33,8 @@ export const routes = [
       { index: true, element: <HomePage /> },
       { path: 'search', element: <SearchPage /> },
       { path: 'credits', element: <CreditsPage /> },
+      { path: 'destinations', element: <DestinationsPage /> },
+      { path: 'destinations/:slug', element: <DestinationPage /> },
       ...UPCOMING.map(({ path, title, phase }) => ({
         path,
         element: <ComingSoonPage title={title} phase={phase} />,

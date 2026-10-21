@@ -23,10 +23,33 @@ class AppError(Exception):
     code = "BAD_REQUEST"
     message = "The request could not be processed."
 
-    def __init__(self, message: str | None = None, *, details: dict[str, Any] | None = None):
+    def __init__(
+        self,
+        message: str | None = None,
+        *,
+        code: str | None = None,
+        details: dict[str, Any] | None = None,
+    ):
         self.message = message or self.message
+        self.code = code or self.code
         self.details = details or {}
         super().__init__(self.message)
+
+
+class BusinessRuleError(AppError):
+    """400 — the request is well-formed but breaks a business rule (e.g. INVALID_DATES)."""
+
+
+class UnauthorizedError(AppError):
+    status_code = 401
+    code = "NOT_AUTHENTICATED"
+    message = "Please log in to continue."
+
+
+class ForbiddenError(AppError):
+    status_code = 403
+    code = "FORBIDDEN"
+    message = "You don't have permission to do that."
 
 
 class NotFoundError(AppError):
@@ -39,6 +62,16 @@ class ConflictError(AppError):
     status_code = 409
     code = "CONFLICT"
     message = "The request conflicts with the current state."
+
+
+class RateLimitedError(AppError):
+    status_code = 429
+    code = "RATE_LIMITED"
+    message = "Too many requests. Please wait a moment and try again."
+
+    def __init__(self, retry_after: int):
+        super().__init__(details={"retry_after_seconds": retry_after})
+        self.retry_after = retry_after
 
 
 class ServiceUnavailableError(AppError):
@@ -70,9 +103,13 @@ _HTTP_CODES = {
 def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def handle_app_error(request: Request, exc: AppError):
+        headers = (
+            {"Retry-After": str(exc.retry_after)} if isinstance(exc, RateLimitedError) else None
+        )
         return JSONResponse(
             status_code=exc.status_code,
             content=error_body(exc.code, exc.message, exc.details, _request_id(request)),
+            headers=headers,
         )
 
     @app.exception_handler(RequestValidationError)

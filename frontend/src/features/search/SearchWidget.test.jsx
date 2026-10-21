@@ -1,9 +1,11 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import SearchWidget from './SearchWidget'
 import { renderWithRouter } from '../../test/renderWithRouter'
 import { addDays, todayIST } from '../../utils/dates'
+
+vi.mock('../../api/catalog', () => import('../../test/mockCatalogApi'))
 
 const setDate = (label, value) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
 
@@ -13,6 +15,8 @@ describe('SearchWidget', () => {
     renderWithRouter(<SearchWidget />)
     const checkIn = addDays(todayIST(), 10)
     const checkOut = addDays(todayIST(), 12)
+    // Wait for the destination list (used to turn "Coorg" into its slug) to load.
+    await waitFor(() => expect(document.querySelectorAll('datalist option')).toHaveLength(4))
 
     await user.type(screen.getByLabelText('Where to?'), 'Coorg')
     setDate('Check-in', checkIn)

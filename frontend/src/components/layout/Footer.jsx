@@ -3,7 +3,7 @@ import { Mail } from 'lucide-react'
 import Logo from './Logo'
 import ApiStatus from '../ApiStatus'
 import { Container } from '../ui/Section'
-import { STATE_ORDER } from '../../data/destinations'
+import { STATE_ORDER } from '../../utils/labels'
 import { STATE_NAMES } from '../../utils/format'
 
 const COLUMNS = [

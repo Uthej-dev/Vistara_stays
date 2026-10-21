@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { addDays, isISODate, nightsBetween, todayIST } from '../../utils/dates'
-import { DESTINATIONS } from '../../data/destinations'
 
 export const LIMITS = {
   rooms: { min: 1, max: 5 },
@@ -47,11 +46,14 @@ export const defaultSearchValues = () => ({
   children: 0,
 })
 
-/** Form values → URL query string for /search. Field names match the API (snake_case). */
-export function toSearchParams(values) {
+/**
+ * Form values → URL query string for /search. Field names match the API (snake_case).
+ * A destination typed exactly as a known name becomes `destination=<slug>`; other text is `q`.
+ */
+export function toSearchParams(values, destinations = []) {
   const params = new URLSearchParams()
   const text = values.destination.trim()
-  const match = DESTINATIONS.find((d) => d.name.toLowerCase() === text.toLowerCase())
+  const match = destinations.find((d) => d.name.toLowerCase() === text.toLowerCase())
   if (match) params.set('destination', match.slug)
   else if (text) params.set('q', text)
   if (values.checkIn && values.checkOut) {
@@ -67,4 +69,22 @@ export function toSearchParams(values) {
 /** Suggest a check-out the day after check-in when the user hasn't picked one. */
 export function suggestedCheckOut(checkIn) {
   return isISODate(checkIn) ? addDays(checkIn, 1) : ''
+}
+
+/** URL search params → form values (inverse of toSearchParams). */
+export function fromSearchParams(params, destinations = []) {
+  const slug = params.get('destination')
+  const name = destinations.find((d) => d.slug === slug)?.name
+  const int = (key, fallback) => {
+    const n = Number.parseInt(params.get(key) ?? '', 10)
+    return Number.isFinite(n) ? n : fallback
+  }
+  return {
+    destination: name ?? params.get('q') ?? '',
+    checkIn: params.get('check_in') ?? '',
+    checkOut: params.get('check_out') ?? '',
+    rooms: int('rooms', 1),
+    adults: int('adults', 2),
+    children: int('children', 0),
+  }
 }

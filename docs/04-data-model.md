@@ -115,7 +115,7 @@ Indexes:
 - `{status: 1, "rating.avg": -1}`, `{status: 1, "rating.count": -1}` — sort paths
 - `{owner_id: 1, status: 1}` — owner dashboard
 - `{location: "2dsphere"}` — distance
-- text index on `{name: 10, destination_name: 5, "address.town": 5, description: 1}` — keyword search
+- keyword search (`q`) uses an escaped, case-insensitive regex on name / destination / town (combines freely with other filters; fine at portfolio scale — Atlas Search is the upgrade path)
 
 ## room_types
 | Field | Type | Notes |

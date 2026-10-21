@@ -2,5 +2,4 @@
 -r requirements.txt
 pytest==9.1.1
 pytest-asyncio==1.4.0       # lets pytest run `async def` tests
-httpx==0.28.1               # async HTTP client used to call the app in tests
 ruff==0.17.1                # linter + formatter

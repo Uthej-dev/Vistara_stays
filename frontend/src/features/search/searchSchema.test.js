@@ -42,7 +42,7 @@ describe('searchSchema', () => {
 
 describe('toSearchParams', () => {
   it('maps a known destination name to its slug', () => {
-    const params = toSearchParams(valid({ destination: '  munnar ' }))
+    const params = toSearchParams(valid({ destination: '  munnar ' }), [{ slug: 'munnar', name: 'Munnar' }])
     expect(params.get('destination')).toBe('munnar')
     expect(params.has('q')).toBe(false)
   })

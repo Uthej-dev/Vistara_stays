@@ -1,14 +1,21 @@
 import {
+  Accessibility,
   Baby,
+  Building,
   CalendarCheck,
+  Car,
+  Flame,
   Flower2,
   Gem,
+  Leaf,
   MessageSquareQuote,
   Mountain,
   PawPrint,
   ReceiptIndianRupee,
+  Sailboat,
   ShieldCheck,
   Sparkles,
+  Sprout,
   SquareParking,
   Trees,
   Users,
@@ -16,21 +23,29 @@ import {
   Waves,
   WavesLadder,
   Wifi,
+  Zap,
 } from 'lucide-react'
 
-// Data files refer to icons by name (so the backend can store them as strings later).
+// The API stores icon names as strings (categories/amenities are admin-managed data).
 // Explicit imports keep the bundle small: only these icons are included.
 const ICONS = {
+  Accessibility,
   Baby,
+  Building,
   CalendarCheck,
+  Car,
+  Flame,
   Flower2,
   Gem,
+  Leaf,
   MessageSquareQuote,
   Mountain,
   PawPrint,
   ReceiptIndianRupee,
+  Sailboat,
   ShieldCheck,
   Sparkles,
+  Sprout,
   SquareParking,
   Trees,
   Users,
@@ -38,6 +53,7 @@ const ICONS = {
   Waves,
   WavesLadder,
   Wifi,
+  Zap,
 }
 
 export default function Icon({ name, ...props }) {

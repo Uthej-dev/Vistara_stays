@@ -2,20 +2,20 @@ import { useState } from 'react'
 import { ArrowRight } from 'lucide-react'
 import { Section } from '../../components/ui/Section'
 import Button from '../../components/ui/Button'
-import DestinationCard from '../../components/destination/DestinationCard'
-import { DESTINATIONS, DESTINATIONS_BY_SLUG, STATE_ORDER } from '../../data/destinations'
-import { STATE_NAMES } from '../../utils/format'
+import { ErrorState } from '../../components/ui/States'
+import DestinationCard, { DestinationCardSkeleton } from '../../components/destination/DestinationCard'
+import { useDestinations } from '../catalog/queries'
+import { STATE_NAMES, STATE_ORDER } from '../../utils/labels'
 import { cn } from '../../utils/cn'
-
-const FEATURED = ['coorg', 'munnar', 'alleppey', 'ooty', 'hampi', 'wayanad', 'araku-valley', 'gokarna']
 
 export default function PopularDestinations() {
   const [state, setState] = useState('all')
+  const { data, isPending, error, refetch } = useDestinations()
 
   const shown =
     state === 'all'
-      ? FEATURED.map((s) => DESTINATIONS_BY_SLUG[s])
-      : DESTINATIONS.filter((d) => d.state === state)
+      ? (data ?? []).filter((d) => d.featured_rank < 1000).slice(0, 8)
+      : (data ?? []).filter((d) => d.state === state)
 
   const filters = [{ value: 'all', label: 'Popular' }, ...STATE_ORDER.map((s) => ({ value: s, label: STATE_NAMES[s] }))]
 
@@ -24,7 +24,7 @@ export default function PopularDestinations() {
       id="destinations"
       eyebrow="Where to go"
       title="Popular destinations"
-      description={`${DESTINATIONS.length} destinations across the hills, coasts and backwaters of the south.`}
+      description={data ? `${data.length} destinations across the hills, coasts and backwaters of the south.` : ' '}
       action={
         <Button to="/destinations" variant="outline" size="sm">
           All destinations <ArrowRight className="size-4" aria-hidden="true" />
@@ -40,9 +40,7 @@ export default function PopularDestinations() {
             onClick={() => setState(f.value)}
             className={cn(
               'shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors',
-              state === f.value
-                ? 'bg-forest-800 text-cream-50'
-                : 'bg-white text-ink-900 ring-1 ring-forest-900/10 hover:bg-forest-100',
+              state === f.value ? 'bg-forest-800 text-cream-50' : 'bg-white text-ink-900 ring-1 ring-forest-900/10 hover:bg-forest-100',
             )}
           >
             {f.label}
@@ -50,13 +48,23 @@ export default function PopularDestinations() {
         ))}
       </div>
 
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {shown.map((d) => (
-          <li key={d.slug}>
-            <DestinationCard destination={d} />
-          </li>
-        ))}
-      </ul>
+      {error ? (
+        <ErrorState error={error} onRetry={refetch} title="Couldn’t load destinations" />
+      ) : (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-busy={isPending}>
+          {isPending
+            ? Array.from({ length: 8 }, (_, i) => (
+                <li key={i}>
+                  <DestinationCardSkeleton />
+                </li>
+              ))
+            : shown.map((d) => (
+                <li key={d.slug}>
+                  <DestinationCard destination={d} />
+                </li>
+              ))}
+        </ul>
+      )}
     </Section>
   )
 }

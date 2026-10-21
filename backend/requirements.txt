@@ -4,6 +4,7 @@ uvicorn[standard]==0.54.0   # ASGI server; [standard] adds uvloop + httptools fo
 pymongo==4.19.0             # official MongoDB driver (we use its AsyncMongoClient)
 pydantic==2.14.1            # request/response validation
 pydantic-settings==2.16.0   # typed settings loaded from environment / .env
-pyjwt==2.15.1               # JSON Web Tokens (Phase 5)
-pwdlib[argon2]==0.3.1       # Argon2id password hashing (Phase 5)
-slowapi==0.1.10             # rate limiting (Phase 5)
+pyjwt==2.15.1               # JSON Web Tokens
+pwdlib[argon2]==0.3.1       # Argon2id password hashing
+httpx==0.28.1               # HTTP client for Resend, Razorpay and Cloudinary APIs
+python-multipart==0.0.32    # multipart form parsing for photo uploads

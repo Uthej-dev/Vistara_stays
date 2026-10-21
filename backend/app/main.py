@@ -11,10 +11,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health
+from app.api.routes import catalog, health
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import RequestContextMiddleware, configure_logging
+from app.core.rate_limit import RateLimiter
 from app.db.indexes import ensure_indexes
 from app.db.mongodb import create_client, get_database
 
@@ -65,8 +66,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     app.state.settings = settings
+    app.state.rate_limiter = RateLimiter()
     register_exception_handlers(app)
-    app.include_router(health.router, prefix=API_PREFIX)
+    for router in (health.router, catalog.router):
+        app.include_router(router, prefix=API_PREFIX)
     return app
 
 

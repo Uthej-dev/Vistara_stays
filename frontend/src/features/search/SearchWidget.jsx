@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import { CalendarDays, MapPin, Search } from 'lucide-react'
 import GuestSelector from './GuestSelector'
 import { defaultSearchValues, searchSchema, suggestedCheckOut, toSearchParams } from './searchSchema'
-import { DESTINATIONS } from '../../data/destinations'
+import { useDestinations } from '../catalog/queries'
 import { addDays, todayIST } from '../../utils/dates'
 import { cn } from '../../utils/cn'
 
@@ -31,9 +31,14 @@ function Field({ id, label, icon: IconComponent, error, children }) {
   )
 }
 
-/** The main booking search: destination, dates, rooms and guests → /search?... */
-export default function SearchWidget({ className }) {
+/**
+ * The main booking search: destination, dates, rooms and guests → /search?...
+ * `initialValues` prefills it (the results page passes the current URL's values);
+ * `keepParams` carries existing filters (e.g. amenities) over to the new search.
+ */
+export default function SearchWidget({ className, initialValues, keepParams }) {
   const navigate = useNavigate()
+  const { data: destinations = [] } = useDestinations()
   const ids = { destination: useId(), checkIn: useId(), checkOut: useId(), list: useId() }
   const today = todayIST()
 
@@ -44,11 +49,22 @@ export default function SearchWidget({ className }) {
     setValue,
     getValues,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(searchSchema), defaultValues: defaultSearchValues() })
+  } = useForm({
+    resolver: zodResolver(searchSchema),
+    defaultValues: initialValues ?? defaultSearchValues(),
+  })
 
   const checkIn = watch('checkIn')
 
-  const onSubmit = (values) => navigate(`/search?${toSearchParams(values)}`)
+  const onSubmit = (values) => {
+    const params = toSearchParams(values, destinations)
+    if (keepParams) {
+      for (const [key, value] of keepParams) {
+        if (!params.has(key)) params.append(key, value)
+      }
+    }
+    navigate(`/search?${params}`)
+  }
 
   const describedBy = (id, error) => (error ? `${id}-error` : undefined)
 
@@ -75,7 +91,7 @@ export default function SearchWidget({ className }) {
           {...register('destination')}
         />
         <datalist id={ids.list}>
-          {DESTINATIONS.map((d) => (
+          {destinations.map((d) => (
             <option key={d.slug} value={d.name} />
           ))}
         </datalist>

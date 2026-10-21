@@ -6,7 +6,7 @@ file with image URLs *and* credits, so the UI can always show proper attribution
 
 Usage (standard library only, any Python 3.10+):
     python3 scripts/fetch_wikimedia_images.py scripts/destination_image_sources.json \
-        frontend/src/data/destinationImages.json
+        backend/scripts/seed_data/destination_images.json
 
 Mapping values are either "File:<Commons file name>" or "wp:<English Wikipedia article>" (uses
 that article's lead image).

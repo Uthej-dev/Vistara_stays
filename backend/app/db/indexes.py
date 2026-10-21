@@ -8,7 +8,7 @@ engine relies on (e.g. one inventory counter per room type per night).
 
 from pymongo import ASCENDING as ASC
 from pymongo import DESCENDING as DESC
-from pymongo import GEOSPHERE, TEXT, IndexModel
+from pymongo import GEOSPHERE, IndexModel
 from pymongo.asynchronous.database import AsyncDatabase
 
 INDEXES: dict[str, list[IndexModel]] = {
@@ -42,21 +42,13 @@ INDEXES: dict[str, list[IndexModel]] = {
             [("status", ASC), ("destination_id", ASC), ("starting_price_paise", ASC)],
             name="search_destination_price",
         ),
+        IndexModel(
+            [("status", ASC), ("featured_rank", ASC), ("rating.avg", DESC)], name="search_featured"
+        ),
         IndexModel([("status", ASC), ("rating.avg", DESC)], name="search_rating"),
         IndexModel([("status", ASC), ("rating.count", DESC)], name="search_reviews"),
         IndexModel([("owner_id", ASC), ("status", ASC)], name="owner_status"),
         IndexModel([("location", GEOSPHERE)], name="geo"),
-        IndexModel(
-            [
-                ("name", TEXT),
-                ("destination_name", TEXT),
-                ("address.town", TEXT),
-                ("description", TEXT),
-            ],
-            weights={"name": 10, "destination_name": 5, "address.town": 5, "description": 1},
-            default_language="english",
-            name="text_search",
-        ),
     ],
     "room_types": [
         IndexModel([("resort_id", ASC), ("status", ASC)], name="resort_status"),
@@ -134,8 +126,17 @@ INDEXES: dict[str, list[IndexModel]] = {
 }
 
 
+# Indexes from earlier versions that are no longer used; dropped if present.
+OBSOLETE_INDEXES = {"resorts": ["text_search"]}
+
+
 async def ensure_indexes(db: AsyncDatabase) -> dict[str, list[str]]:
     """Create every declared index. Returns {collection: [index names]} for logging."""
+    for collection, names in OBSOLETE_INDEXES.items():
+        existing = await db[collection].index_information()
+        for name in names:
+            if name in existing:
+                await db[collection].drop_index(name)
     created: dict[str, list[str]] = {}
     for collection, models in INDEXES.items():
         created[collection] = await db[collection].create_indexes(models)
