@@ -91,10 +91,36 @@ unset MONGODB_URI MONGODB_DB APP_ENV SEED_PASSWORD IMAGE_STORAGE CLOUDINARY_API_
    keeps the refresh-token cookie first-party.
 3. Deploy, then put the Vercel URL into Render's `CORS_ORIGINS` and `FRONTEND_URL` and redeploy the API.
 
+## 5b. Alternative: API on Vercel too (current live demo)
+
+The live demo runs both halves on Vercel, so only one account is needed:
+
+| Project | Root | URL |
+|---|---|---|
+| `vistara-stays` (website) | `frontend/` | https://vistara-stays-pi.vercel.app |
+| `vistara-api` (FastAPI) | `backend/` | https://vistara-api-phi.vercel.app |
+
+- `backend/api/index.py` exports the FastAPI `app`; `backend/vercel.json` selects the FastAPI
+  preset, which routes every path to it. `backend/.vercelignore` keeps `.env`, `.venv`, tests and the
+  local test database out of the bundle (Vercel's function limit is 225 MB).
+- `frontend/vercel.json` rewrites `/api/*` to the API project, so cookies stay first-party.
+- Serverless differences: `MAINTENANCE_INTERVAL_SECONDS=0` (expired holds are released lazily on
+  read/book), `ENSURE_INDEXES_ON_STARTUP=false` (run `python -m scripts.ensure_indexes` once with
+  `MONGODB_DB=vistara_prod`), the rate limiter is per instance, and the DB client is created on the
+  first request if the runtime skips the lifespan hook. There is no writable disk, so
+  `IMAGE_STORAGE` is `disabled` (uploads return `UPLOADS_DISABLED`) until Cloudinary keys are added.
+- Atlas Network Access must allow `0.0.0.0/0` (Vercel has no fixed egress IPs).
+- Env vars (Production): `APP_ENV=production`, `MONGODB_URI`, `MONGODB_DB=vistara_prod`,
+  `JWT_SECRET`, `COOKIE_SECURE=true`, `CORS_ORIGINS`/`FRONTEND_URL`/`PUBLIC_API_URL` = website URL,
+  `IMAGE_STORAGE`, `PAYMENT_PROVIDER=simulated`, `EMAIL_BACKEND=console`, `SMS_BACKEND=console`.
+- Redeploy: `cd backend && vercel deploy --prod`, `cd frontend && vercel deploy --prod`.
+- Console emails/SMS (including set-password links) appear in `vercel logs` for `vistara-api`.
+
 ## 6. Smoke test production
 
 - [ ] Home page loads over HTTPS; DevTools → Console has no CSP errors.
-- [ ] Sign up → the verification link appears in **Render → Logs** (console email) → verify.
+- [ ] Reserve as a visitor (first/last name, email, mobile) → account created → the booking email,
+      SMS and set-password link appear in the API logs (console backends).
 - [ ] Book a sample resort with the simulated payment; cancel it.
 - [ ] DevTools → Application → Cookies: `vs_refresh` is `HttpOnly`, `Secure`, `SameSite=Lax`.
 - [ ] Log in as your admin → `/admin` works; a customer account gets “You don’t have access”.

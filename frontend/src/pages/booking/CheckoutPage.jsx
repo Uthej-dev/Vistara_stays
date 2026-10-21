@@ -4,9 +4,9 @@ import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Info, ShieldCheck } from 'lucide-react'
 import { Container } from '../../components/ui/Section'
-import { FormAlert, SubmitButton, TextField } from '../../components/ui/Form'
+import { FormAlert, PasswordField, SubmitButton, TextField } from '../../components/ui/Form'
 import { ErrorState, Skeleton } from '../../components/ui/States'
 import PriceBreakdown from '../../components/booking/PriceBreakdown'
 import { StaySummary } from '../../components/booking/BookingBits'
@@ -14,22 +14,15 @@ import { useAuth } from '../../features/auth/AuthProvider'
 import { useToast } from '../../components/ui/Toast'
 import { getQuote } from '../../api/stays'
 import { createBooking } from '../../api/bookings'
-import { resendVerification } from '../../api/auth'
+import { checkoutSignup } from '../../api/auth'
 import { fieldErrors, toApiError } from '../../api/client'
 import { useResort } from '../../features/catalog/queries'
 
-const NATIONALITIES = [
-  ['IN', 'India'], ['US', 'United States'], ['GB', 'United Kingdom'], ['AE', 'United Arab Emirates'], ['SG', 'Singapore'],
-  ['AU', 'Australia'], ['CA', 'Canada'], ['DE', 'Germany'], ['FR', 'France'], ['MY', 'Malaysia'], ['LK', 'Sri Lanka'], ['NP', 'Nepal'],
-]
-
 const guestSchema = z.object({
-  name: z.string().trim().min(2, 'Enter the lead guest’s full name').max(80),
+  first_name: z.string().trim().min(1, 'Enter your first name').max(50),
+  last_name: z.string().trim().min(1, 'Enter your last name').max(50),
   email: z.string().trim().email('Enter a valid email address'),
   phone: z.string().trim().regex(/^\+[1-9]\d{7,14}$/, 'Use international format, e.g. +919876543210'),
-  age: z.coerce.number({ message: 'Enter an age' }).int().min(18, 'The lead guest must be 18 or older').max(120, 'Enter a valid age'),
-  nationality: z.string().regex(/^[A-Z]{2}$/),
-  arrival_time: z.string().regex(/^(\d{2}:\d{2})?$/).optional(),
   special_requests: z.string().trim().max(500).optional(),
   accept: z.literal(true, { message: 'Please accept the cancellation policy' }),
 })
@@ -48,16 +41,31 @@ function readStay(params) {
   }
 }
 
+/** Split a stored full name into first/last for prefilling. */
+function nameParts(user) {
+  if (!user) return { first_name: '', last_name: '' }
+  if (user.first_name || user.last_name) return { first_name: user.first_name ?? '', last_name: user.last_name ?? '' }
+  const parts = (user.name ?? '').trim().split(/\s+/)
+  return { first_name: parts[0] ?? '', last_name: parts.slice(1).join(' ') }
+}
+
+/**
+ * Checkout. No login needed first: a guest enters first name, last name, email and mobile, and
+ * we create their account and sign them in as part of holding the room. If the email already
+ * has an account, they enter their password right here instead.
+ */
 export default function CheckoutPage() {
   const [params] = useSearchParams()
   const stay = useMemo(() => readStay(params), [params])
   const resortSlug = params.get('resort')
-  const { user } = useAuth()
+  const { user, status, login, applySession } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
   const [coupon, setCoupon] = useState('')
   const [appliedCoupon, setAppliedCoupon] = useState(null)
   const [serverError, setServerError] = useState(null)
+  const [needsPassword, setNeedsPassword] = useState(false)
+  const [password, setPassword] = useState('')
   // One key per checkout attempt: double-clicks and retries reuse it, so only one booking exists.
   const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID())
 
@@ -73,15 +81,25 @@ export default function CheckoutPage() {
     register,
     handleSubmit,
     setError,
+    reset,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(guestSchema),
-    defaultValues: { name: user.name, email: user.email, phone: user.phone ?? '', nationality: 'IN', age: '', arrival_time: '', special_requests: '' },
+    defaultValues: { ...nameParts(user), email: user?.email ?? '', phone: user?.phone ?? '', special_requests: '' },
   })
 
   useEffect(() => {
     document.title = 'Checkout · Vistara Stays'
   }, [])
+
+  // When the session finishes loading (or the guest logs in here), prefill from their account.
+  const [prefilledFor, setPrefilledFor] = useState(user?.id ?? null)
+  if (user && prefilledFor !== user.id) {
+    setPrefilledFor(user.id)
+    const current = getValues()
+    reset({ ...current, ...nameParts(user), email: user.email, phone: current.phone || user.phone || '' })
+  }
 
   // Validate a coupon with the server before using it; show the reason if it's rejected.
   const applyCoupon = async (code) => {
@@ -93,16 +111,32 @@ export default function CheckoutPage() {
     }
   }
 
-  const onSubmit = async ({ accept: _accept, special_requests, arrival_time, ...guest }) => {
+  /** Make sure there's a signed-in customer: existing session, password login, or new account. */
+  const ensureSignedIn = async (guest) => {
+    if (status === 'authenticated') return true
+    if (needsPassword) {
+      await login({ email: guest.email, password })
+      return true
+    }
+    try {
+      applySession(await checkoutSignup(guest))
+      return true
+    } catch (error) {
+      if (error?.response?.data?.error?.code === 'ACCOUNT_EXISTS') {
+        setNeedsPassword(true)
+        setServerError(null)
+        return false
+      }
+      throw error
+    }
+  }
+
+  const onSubmit = async ({ accept: _accept, special_requests, ...guest }) => {
     setServerError(null)
     try {
+      if (!(await ensureSignedIn(guest))) return
       const booking = await createBooking(
-        {
-          ...stay,
-          coupon_code: appliedCoupon,
-          guest_details: { ...guest, ...(arrival_time ? { arrival_time } : {}) },
-          special_requests: special_requests || null,
-        },
+        { ...stay, coupon_code: appliedCoupon, guest_details: guest, special_requests: special_requests || null },
         idempotencyKey,
       )
       navigate(`/checkout/${booking.id}`, { replace: true })
@@ -122,6 +156,7 @@ export default function CheckoutPage() {
   const snapshot = resort.data
     ? { name: resort.data.name, cover: resort.data.images[0], room_type_name: resort.data.room_types.find((r) => r.id === stay.room_type_id)?.name, is_sample: resort.data.is_sample }
     : null
+  const wrongAccountType = user && user.role !== 'customer'
 
   return (
     <Container className="py-10">
@@ -134,32 +169,30 @@ export default function CheckoutPage() {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_400px]">
         <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
-          {!user.email_verified && (
-            <FormAlert>
-              Please verify your email before booking — we send your confirmation there.{' '}
-              <button type="button" className="font-semibold underline" onClick={() => resendVerification().then(() => toast.success('Verification email sent.'))}>
-                Resend verification email
-              </button>
-            </FormAlert>
+          {wrongAccountType && (
+            <FormAlert>You’re signed in as a {user.role}. Bookings are made from guest accounts — log out to book.</FormAlert>
           )}
           <FormAlert>{serverError}</FormAlert>
 
           <section className="rounded-3xl bg-white p-6 ring-1 ring-forest-900/5">
-            <h2 className="font-display text-2xl text-forest-900">Lead guest</h2>
-            <p className="mt-1 text-sm text-ink-600">The person checking in. They must be 18 or older and show a photo ID at the property.</p>
+            <h2 className="font-display text-2xl text-forest-900">Your details</h2>
+            <p className="mt-1 text-sm text-ink-600">
+              {status === 'authenticated'
+                ? 'The person checking in. Your booking confirmation is sent to this email and mobile number.'
+                : 'No account needed — we’ll set one up with these details so you can manage your booking. Your confirmation is sent to this email and mobile number.'}
+            </p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <TextField label="Full name (as on ID)" autoComplete="name" error={errors.name?.message} {...register('name')} />
-              <TextField label="Email" type="email" autoComplete="email" error={errors.email?.message} {...register('email')} />
+              <TextField label="First name" autoComplete="given-name" error={errors.first_name?.message} {...register('first_name')} />
+              <TextField label="Last name" autoComplete="family-name" error={errors.last_name?.message} {...register('last_name')} />
+              <TextField
+                label="Email"
+                type="email"
+                autoComplete="email"
+                readOnly={status === 'authenticated' || needsPassword}
+                error={errors.email?.message}
+                {...register('email')}
+              />
               <TextField label="Mobile number" type="tel" autoComplete="tel" placeholder="+919876543210" error={errors.phone?.message} {...register('phone')} />
-              <TextField label="Age" type="number" inputMode="numeric" min="18" error={errors.age?.message} {...register('age')} />
-              <TextField as="select" label="Nationality" error={errors.nationality?.message} {...register('nationality')}>
-                {NATIONALITIES.map(([code, name]) => (
-                  <option key={code} value={code}>
-                    {name}
-                  </option>
-                ))}
-              </TextField>
-              <TextField label="Estimated arrival time (optional)" type="time" error={errors.arrival_time?.message} {...register('arrival_time')} />
               <TextField
                 as="textarea"
                 className="sm:col-span-2"
@@ -169,9 +202,36 @@ export default function CheckoutPage() {
                 {...register('special_requests')}
               />
             </div>
+
+            {needsPassword && (
+              <div className="mt-5 rounded-2xl bg-cream-100 p-4">
+                <p className="flex items-start gap-2 text-sm text-ink-900">
+                  <Info className="mt-0.5 size-4 shrink-0 text-forest-700" aria-hidden="true" />
+                  You already have an account with this email. Enter your password to continue.
+                </p>
+                <PasswordField className="mt-3" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                <p className="mt-2 text-xs text-ink-600">
+                  Booked with us before without a password?{' '}
+                  <Link to="/forgot-password" className="font-medium underline">
+                    Set a password
+                  </Link>{' '}
+                  ·{' '}
+                  <button
+                    type="button"
+                    className="font-medium underline"
+                    onClick={() => {
+                      setNeedsPassword(false)
+                      setPassword('')
+                    }}
+                  >
+                    Use a different email
+                  </button>
+                </p>
+              </div>
+            )}
             <p className="mt-4 flex items-start gap-2 text-xs text-ink-600">
               <ShieldCheck className="mt-0.5 size-4 shrink-0 text-forest-700" aria-hidden="true" />
-              We never ask for ID numbers online. Your details are shared only with this property to prepare your stay.
+              Guests show a photo ID at check-in — we never ask for ID numbers online. Your details are shared only with this property.
             </p>
           </section>
 
@@ -196,24 +256,28 @@ export default function CheckoutPage() {
             {errors.accept && <p className="mt-1 text-xs text-clay-600">{errors.accept.message}</p>}
           </section>
 
-          <SubmitButton loading={isSubmitting} disabled={!user.email_verified || !quote.data?.available || isSubmitting} className="w-full sm:w-auto">
-            Hold room & continue to payment
+          <SubmitButton
+            loading={isSubmitting}
+            disabled={wrongAccountType || status === 'loading' || !quote.data?.available || isSubmitting || (needsPassword && !password)}
+            className="w-full sm:w-auto"
+          >
+            {needsPassword ? 'Log in & continue to payment' : 'Continue to payment'}
           </SubmitButton>
           {quote.data && !quote.data.available && <p className="text-sm text-clay-600">This room is no longer available for these dates.</p>}
+          {status !== 'authenticated' && !needsPassword && (
+            <p className="text-sm text-ink-600">
+              Already have an account?{' '}
+              <Link to={`/login?next=${encodeURIComponent(`/checkout?${params.toString()}`)}`} className="font-medium text-forest-800 underline">
+                Log in
+              </Link>
+            </p>
+          )}
         </form>
 
         <aside aria-label="Price summary" className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-3xl bg-white p-6 ring-1 ring-forest-900/5">
             {snapshot ? (
-              <StaySummary
-                snapshot={snapshot}
-                checkIn={stay.check_in}
-                checkOut={stay.check_out}
-                nights={price?.nights_count ?? 0}
-                rooms={stay.rooms}
-                guests={stay}
-                mealPlan={price?.meal_plan}
-              />
+              <StaySummary snapshot={snapshot} checkIn={stay.check_in} checkOut={stay.check_out} nights={price?.nights_count ?? 0} rooms={stay.rooms} guests={stay} mealPlan={price?.meal_plan} />
             ) : (
               <Skeleton className="h-24" />
             )}

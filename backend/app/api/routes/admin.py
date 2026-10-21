@@ -137,7 +137,9 @@ async def cancel_booking(
     if not doc:
         raise NotFoundError("Booking not found.")
     state = request.app.state
-    engine = make_booking_service(db, state.settings, state.email_outbox, state.razorpay_client)
+    engine = make_booking_service(
+        db, state.settings, state.email_outbox, state.razorpay_client, state.sms_outbox
+    )
     return booking_out(
         await engine.cancel(doc, actor=admin, reason=body.reason), include_preview=False
     )

@@ -20,10 +20,12 @@ describe('HomePage', () => {
         'Find the right kind of stay',
         'Collections & seasonal picks',
         'Booking you can trust',
-        'Own a resort, villa or homestay?',
       ]),
     )
     expect(screen.getByRole('form', { name: 'Search stays' })).toBeInTheDocument()
+    // Owner sign-up is not advertised on the public site.
+    expect(screen.queryByText(/list your property/i)).not.toBeInTheDocument()
+    expect(document.querySelector('a[href^="/owners"], a[href="/owner"]')).toBeNull()
     expect(await screen.findByRole('link', { name: 'Misty Fern Estate Stay' })).toBeInTheDocument()
   })
 

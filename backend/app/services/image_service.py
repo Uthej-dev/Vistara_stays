@@ -59,6 +59,10 @@ class ImageService:
         return kind
 
     async def store(self, data: bytes, *, folder: str, alt: str) -> dict:
+        if self.settings.image_storage == "disabled":
+            raise ServiceUnavailableError(
+                "Photo uploads are turned off on this deployment.", code="UPLOADS_DISABLED"
+            )
         kind = self.validate(data)
         if self.settings.image_storage == "cloudinary":
             return await self._store_cloudinary(data, folder=folder, alt=alt)

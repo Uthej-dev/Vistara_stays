@@ -26,7 +26,9 @@ IdempotencyKey = Annotated[
 
 def get_booking_service(request: Request, db: DbDep) -> BookingService:
     state = request.app.state
-    return make_booking_service(db, state.settings, state.email_outbox, state.razorpay_client)
+    return make_booking_service(
+        db, state.settings, state.email_outbox, state.razorpay_client, state.sms_outbox
+    )
 
 
 BookingServiceDep = Annotated[BookingService, Depends(get_booking_service)]

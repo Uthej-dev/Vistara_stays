@@ -34,7 +34,8 @@ class Settings(BaseSettings):
     access_token_ttl_min: int = Field(15, ge=1, le=120)
     refresh_token_ttl_days: int = Field(14, ge=1, le=90)
     cookie_secure: bool = False  # must be True in production (HTTPS only)
-    require_email_verification: bool = True  # verified email needed before booking
+    # Off by default: guests create their account at checkout and book straight away.
+    require_email_verification: bool = False
     rate_limit_enabled: bool = True
 
     # Email: "console" logs emails (development); "resend" sends via the Resend API
@@ -42,8 +43,16 @@ class Settings(BaseSettings):
     email_from: str = "Vistara Stays <no-reply@vistarastays.example>"
     resend_api_key: str | None = None
 
-    # Images: "local" stores uploads on disk (development only); "cloudinary" for production
-    image_storage: Literal["local", "cloudinary"] = "local"
+    # SMS: "console" logs messages (development); "twilio" sends via the Twilio API.
+    # Note: business SMS to Indian numbers needs DLT registration with your provider.
+    sms_backend: Literal["console", "twilio"] = "console"
+    twilio_account_sid: str | None = None
+    twilio_auth_token: str | None = None
+    twilio_from_number: str | None = None
+
+    # Images: "local" stores uploads on disk (development only); "cloudinary" for production;
+    # "disabled" turns uploads off (e.g. a serverless demo without Cloudinary).
+    image_storage: Literal["local", "cloudinary", "disabled"] = "local"
     media_dir: str = "media"
     public_api_url: str = "http://localhost:8000"
     cloudinary_cloud_name: str | None = None
@@ -76,8 +85,8 @@ class Settings(BaseSettings):
                 raise ValueError("CORS_ORIGINS cannot be '*' in production")
             if not self.cookie_secure:
                 raise ValueError("COOKIE_SECURE must be true in production")
-            if self.image_storage != "cloudinary":
-                raise ValueError("IMAGE_STORAGE must be 'cloudinary' in production")
+            if self.image_storage == "local":
+                raise ValueError("IMAGE_STORAGE must be 'cloudinary' or 'disabled' in production")
         if self.image_storage == "cloudinary" and not all(
             [self.cloudinary_cloud_name, self.cloudinary_api_key, self.cloudinary_api_secret]
         ):
@@ -86,6 +95,10 @@ class Settings(BaseSettings):
             [self.razorpay_key_id, self.razorpay_key_secret, self.razorpay_webhook_secret]
         ):
             raise ValueError("PAYMENT_PROVIDER=razorpay requires the three RAZORPAY_* settings")
+        if self.sms_backend == "twilio" and not all(
+            [self.twilio_account_sid, self.twilio_auth_token, self.twilio_from_number]
+        ):
+            raise ValueError("SMS_BACKEND=twilio requires the three TWILIO_* settings")
         if self.email_backend == "resend" and not self.resend_api_key:
             raise ValueError("EMAIL_BACKEND=resend requires RESEND_API_KEY")
         return self

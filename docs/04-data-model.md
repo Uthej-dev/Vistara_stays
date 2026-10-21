@@ -171,7 +171,7 @@ Retention: past dates older than 2 years can be archived/deleted; bookings keep 
 | **nights** | int | |
 | **rooms** | int | |
 | **guests** | `{adults, children, child_ages[]}` | |
-| **guest_details** | `{name, email, phone, age (18–120), nationality: "IN"\|ISO-3166 code, arrival_time?: "HH:MM"}` | lead guest; PII. Visible to the booking user, the resort owner (time-window rule), and admins. No ID numbers stored. |
+| **guest_details** | `{first_name, last_name, name (derived), email, phone (E.164)}` | lead guest; PII. Visible to the booking user, the resort owner (time-window rule), and admins. No ID numbers stored. |
 | special_requests | string | |
 | **status** | enum | see state machine in [06-booking-engine.md](06-booking-engine.md) |
 | **payment_status** | enum | `unpaid`, `paid`, `refund_pending`, `partially_refunded`, `refunded`, `failed` |

@@ -19,11 +19,10 @@ def day(offset: int) -> str:
 
 
 GUEST = {
-    "name": "Asha Rao",
+    "first_name": "Asha",
+    "last_name": "Rao",
     "email": "asha@example.com",
     "phone": "+919876543210",
-    "age": 34,
-    "nationality": "IN",
 }
 
 
@@ -101,10 +100,27 @@ async def test_booking_holds_rooms_and_snapshots_price_and_policy(client, db):
     assert all(n["reserved_units"] == 1 for n in nights)
 
 
-async def test_unverified_email_cannot_book(client, db):
+async def test_unverified_accounts_can_book_by_default(client, db):
     listing = await make_listing(db)
     customer = await make_user(db, email_verified=False)
     response = await book(client, customer, body(listing["room"]))
+    assert response.status_code == 201
+
+
+async def test_email_verification_can_be_required_by_setting(db):
+    import httpx
+
+    from app.main import create_app
+    from tests.conftest import make_settings
+
+    app = create_app(make_settings(require_email_verification=True))
+    async with app.router.lifespan_context(app):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://test"
+        ) as c:
+            listing = await make_listing(app.state.db)
+            customer = await make_user(app.state.db, email_verified=False)
+            response = await book(c, customer, body(listing["room"]))
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "EMAIL_NOT_VERIFIED"
 
@@ -119,11 +135,11 @@ async def test_only_customers_can_book(client, db, role):
 @pytest.mark.parametrize(
     "guest_change",
     [
-        {"age": 17},
         {"phone": "98765"},
         {"email": "not-an-email"},
-        {"name": ""},
-        {"nationality": "india"},
+        {"first_name": ""},
+        {"last_name": ""},
+        {"age": 30},  # unknown fields are rejected — only the four details are accepted
     ],
 )
 async def test_lead_guest_details_are_validated(client, db, guest_change):

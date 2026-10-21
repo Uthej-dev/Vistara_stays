@@ -130,6 +130,44 @@ class AuthService:
 
     # ---------- public operations ----------
 
+    async def checkout_signup(self, data, meta: dict) -> dict:
+        """Create a customer account from checkout details (no password yet) and sign them in.
+
+        If the email already has an account we never sign in on the strength of an email address
+        alone — the guest must log in with their password (ACCOUNT_EXISTS)."""
+        if await self.users.find_one({"email": data.email}, {"_id": 1}):
+            raise ConflictError(
+                "You already have an account with this email. Please enter your password.",
+                code="ACCOUNT_EXISTS",
+            )
+        now = now_utc()
+        user = {
+            "email": data.email,
+            "name": f"{data.first_name} {data.last_name}",
+            "first_name": data.first_name,
+            "last_name": data.last_name,
+            "phone": data.phone,
+            "password_hash": None,  # set later from the emailed link
+            "role": Role.CUSTOMER,
+            "status": UserStatus.ACTIVE,
+            "email_verified": False,
+            "token_version": 0,
+            "created_via": "checkout",
+            "preferences": {"destinations": [], "newsletter": False},
+            "created_at": now,
+            "updated_at": now,
+        }
+        try:
+            user["_id"] = (await self.users.insert_one(user)).inserted_id
+        except DuplicateKeyError as exc:  # two tabs racing with the same email
+            raise ConflictError(
+                "You already have an account with this email.", code="ACCOUNT_EXISTS"
+            ) from exc
+        # The emailed link both proves the address and lets them choose a password.
+        token = await self._one_time_token(user["_id"], "reset_password", timedelta(days=7))
+        await self.email.send_set_password(user["email"], data.first_name, token)
+        return await self._issue(user, meta)
+
     async def signup(self, data, meta: dict) -> dict:
         user = {
             "email": data.email,
@@ -243,9 +281,16 @@ class AuthService:
 
     async def reset_password(self, token: str, new_password: str) -> None:
         doc = await self._consume_token(token, "reset_password")
+        # The link arrived by email, so using it also proves the email address.
         await self.users.update_one(
             {"_id": doc["user_id"]},
-            {"$set": {"password_hash": hash_password(new_password), "updated_at": now_utc()}},
+            {
+                "$set": {
+                    "password_hash": hash_password(new_password),
+                    "email_verified": True,
+                    "updated_at": now_utc(),
+                }
+            },
         )
         await self.revoke_all(doc["user_id"], "password_reset")
 

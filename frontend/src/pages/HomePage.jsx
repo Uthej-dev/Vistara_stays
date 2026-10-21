@@ -5,7 +5,6 @@ import FeaturedResorts from '../features/home/FeaturedResorts'
 import Categories from '../features/home/Categories'
 import Collections from '../features/home/Collections'
 import TrustAndReviews from '../features/home/TrustAndReviews'
-import OwnerCta from '../features/home/OwnerCta'
 
 export default function HomePage() {
   useEffect(() => {
@@ -20,7 +19,6 @@ export default function HomePage() {
       <Categories />
       <Collections />
       <TrustAndReviews />
-      <OwnerCta />
     </>
   )
 }

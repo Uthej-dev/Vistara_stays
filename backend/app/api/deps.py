@@ -14,6 +14,7 @@ from app.core.config import Settings
 from app.core.errors import ForbiddenError, UnauthorizedError
 from app.core.rate_limit import RateLimiter
 from app.core.security import TokenError, decode_access_token
+from app.db.mongodb import create_client, get_database
 from app.models.enums import Role, UserStatus
 
 
@@ -23,8 +24,15 @@ def get_app_settings(request: Request) -> Settings:
 
 
 def get_db(request: Request) -> AsyncDatabase:
-    """The database handle created at startup (see `lifespan` in main.py)."""
-    return request.app.state.db
+    """The database handle created at startup (see `lifespan` in main.py).
+
+    Some serverless hosts (e.g. Vercel's Python runtime) may not run the lifespan hook, so the
+    client is created on first use instead. The client connects lazily, so this is cheap."""
+    state = request.app.state
+    if getattr(state, "db", None) is None:
+        settings = state.settings
+        state.db = get_database(create_client(settings), settings)
+    return state.db
 
 
 SettingsDep = Annotated[Settings, Depends(get_app_settings)]

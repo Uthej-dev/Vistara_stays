@@ -38,7 +38,7 @@ The frontend hides routes the user cannot access, but **the backend enforces it*
 
 1. `/signup` → `POST /auth/signup` → logged in immediately (access token + refresh cookie). A verification email is sent (console in dev).
 2. Back on the resort page, picks room type "Valley View Cottage", 1 room → `POST /bookings/quote` shows the itemized breakdown (nightly rates, extra guests, discount, GST, service fee, total).
-3. If the email isn't verified yet, the page asks them to verify first (with a resend button). Then they fill in the **guest details** form (name, email, mobile, age 18+, nationality, optional arrival time and requests) and click **Continue** → `POST /bookings` with an `Idempotency-Key` header → booking `pending_payment`, inventory held for 15 min → navigates to `/checkout/:id` with a countdown timer.
+3. No login is needed: the visitor fills in **first name, last name, email and mobile** (prefilled when signed in) and clicks **Continue to payment**. A new email creates a customer account and signs them in (`POST /auth/checkout-signup`, set-password link emailed); an existing email asks for that account's password. Then → `POST /bookings` with an `Idempotency-Key` header → booking `pending_payment`, inventory held for 15 min → navigates to `/checkout/:id` with a countdown timer.
 4. Clicks **Pay (simulated)** → `POST /payments/simulated/{bookingId}/succeed` → booking `confirmed` (or `pending_owner` if the resort requires manual confirmation).
 5. Confirmation screen + email. `/trips` lists it.
 6. Double-clicking Pay or refreshing during step 3 never creates two bookings (idempotency key).

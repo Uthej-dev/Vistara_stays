@@ -22,6 +22,16 @@ async def main() -> None:
         for name in ("room_types", "inventory", "rate_rules", "bookings", "reviews", "enquiries"):
             counts[name] = (await db[name].delete_many({"resort_id": {"$in": ids}})).deleted_count
         counts["resorts"] = (await db["resorts"].delete_many({"_id": {"$in": ids}})).deleted_count
+        # Guest accounts created by the visitor-checkout journey (their bookings are cancelled).
+        users = await db["users"].distinct("_id", {"email": {"$regex": r"^e2e\+"}})
+        bookings = await db["bookings"].distinct("_id", {"user_id": {"$in": users}})
+        linked = {"$or": [{"user_id": {"$in": users}}, {"booking_id": {"$in": bookings}}]}
+        for name in ("payments", "notifications", "auth_tokens", "refresh_tokens"):
+            counts[name] = (await db[name].delete_many(linked)).deleted_count
+        counts["guest_bookings"] = (
+            await db["bookings"].delete_many({"_id": {"$in": bookings}})
+        ).deleted_count
+        counts["users"] = (await db["users"].delete_many({"_id": {"$in": users}})).deleted_count
         print("Removed:", counts)
     finally:
         await client.close()

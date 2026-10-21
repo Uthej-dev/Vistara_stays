@@ -226,9 +226,7 @@ export function TripPage() {
               </div>
               <div>
                 <dt className="text-ink-600">Lead guest</dt>
-                <dd className="font-medium">
-                  {b.guest_details.name}, {b.guest_details.age}
-                </dd>
+                <dd className="font-medium">{b.guest_details.name}</dd>
               </div>
               <div>
                 <dt className="text-ink-600">Contact</dt>

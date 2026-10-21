@@ -98,15 +98,20 @@ class ResortAvailability(BaseModel):
 GuestName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=80)]
 
 
-class GuestDetails(APIModel):
-    """Lead guest. Must be an adult. ID documents are checked at the property, never collected here."""
+PersonPart = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
 
-    name: GuestName
+
+class GuestDetails(APIModel):
+    """Lead guest contact details. ID documents are checked at the property, never collected here."""
+
+    first_name: PersonPart
+    last_name: PersonPart
     email: EmailStr
     phone: Phone
-    age: int = Field(ge=18, le=120)
-    nationality: Annotated[str, StringConstraints(pattern=r"^[A-Z]{2}$")] = "IN"
-    arrival_time: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
+
+    @property
+    def full_name(self) -> str:
+        return f"{self.first_name} {self.last_name}"
 
 
 class EnquiryRequest(APIModel):

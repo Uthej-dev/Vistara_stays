@@ -59,7 +59,7 @@ describe('ResortPage', () => {
     expect(calls.find((c) => c.key === 'GET /resorts/r1/availability').config.params).toMatchObject({ check_in: checkIn, adults: 2 })
   })
 
-  it('asks visitors to log in before reserving, keeping their selection', async () => {
+  it('lets visitors reserve without logging in, keeping their selection', async () => {
     const user = userEvent.setup()
     fakeServer({ 'GET /resorts/r1/availability': () => [200, availability()] })
     const { router } = renderApp(path)
@@ -67,9 +67,8 @@ describe('ResortPage', () => {
 
     await user.click(await within(panel).findByRole('button', { name: 'Reserve' }))
 
-    await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
-    const next = decodeURIComponent(router.state.location.search.replace('?next=', ''))
-    expect(next).toBe(`/checkout?check_in=${checkIn}&check_out=${checkOut}&rooms=1&adults=2&children=0&room=rt1&resort=${DETAIL.slug}`)
+    await waitFor(() => expect(router.state.location.pathname).toBe('/checkout'))
+    expect(router.state.location.search).toBe(`?check_in=${checkIn}&check_out=${checkOut}&rooms=1&adults=2&children=0&room=rt1&resort=${DETAIL.slug}`)
   })
 
   it('sends signed-in customers straight to checkout', async () => {

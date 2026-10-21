@@ -68,11 +68,17 @@ def refund_for(booking: dict, today, *, full: bool = False) -> dict:
 
 class BookingService:
     def __init__(
-        self, db: AsyncDatabase, email: EmailService | None = None, settings=None, refunder=None
+        self,
+        db: AsyncDatabase,
+        email: EmailService | None = None,
+        settings=None,
+        refunder=None,
+        sms=None,
     ):
         """`refunder(booking_id, amount_paise, reason)` asks the payment provider for a refund;
         it's set when real payments (Razorpay) are enabled."""
         self.refunder = refunder
+        self.sms = sms
         self.db = db
         self.client = db.client
         self.bookings = db["bookings"]
@@ -149,7 +155,10 @@ class BookingService:
                 "children": body.children,
                 "child_ages": body.child_ages,
             },
-            "guest_details": body.guest_details.model_dump(),
+            "guest_details": {
+                **body.guest_details.model_dump(),
+                "name": body.guest_details.full_name,
+            },
             "special_requests": body.special_requests,
             "status": BookingStatus.PENDING_PAYMENT,
             "payment_status": PaymentStatus.UNPAID,
@@ -799,6 +808,12 @@ class BookingService:
             await self.email.send_notification(
                 booking["guest_details"]["email"], subjects[kind], text, f"booking.{kind}"
             )
+        if self.sms:
+            sms = (
+                f"Vistara Stays: {subjects[kind]}. {booking['booking_ref']} · {snap['name']}, "
+                f"{booking['check_in']} to {booking['check_out']}. Full details sent to your email."
+            )
+            await self.sms.send(booking["guest_details"]["phone"], sms)
 
 
 def booking_out(booking: dict, *, include_preview: bool = True) -> dict:

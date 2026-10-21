@@ -119,6 +119,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.rate_limiter = RateLimiter()
     app.state.email_outbox = []  # console email backend keeps recent emails here
+    app.state.sms_outbox = []  # console SMS backend keeps recent messages here
     app.state.razorpay_client = None  # tests inject a fake; None = real client from settings
     register_exception_handlers(app)
     for router in (

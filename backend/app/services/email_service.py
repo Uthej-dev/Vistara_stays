@@ -93,5 +93,18 @@ class EmailService:
             )
         )
 
+    async def send_set_password(self, to: str, first_name: str, token: str) -> None:
+        link = self._link(f"/reset-password?token={token}&welcome=1")
+        await self.send(
+            Email(
+                to=to,
+                subject="Welcome to Vistara Stays — set your password",
+                text=f"Hi {first_name},\n\nWe created your Vistara Stays account when you started a booking.\n"
+                f"Choose a password to sign in again later and manage your trips:\n{link}\n\n"
+                "This link expires in 7 days.",
+                tags={"link": link, "kind": "set_password"},
+            )
+        )
+
     async def send_notification(self, to: str, subject: str, text: str, kind: str) -> None:
         await self.send(Email(to=to, subject=subject, text=text, tags={"kind": kind}))

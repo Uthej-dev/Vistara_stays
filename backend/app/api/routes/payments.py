@@ -29,7 +29,9 @@ def payment_service(request: Request, db: DbDep, settings: SettingsDep) -> Payme
     if settings.payment_provider != "razorpay":
         raise NotFoundError()
     state = request.app.state
-    bookings = make_booking_service(db, settings, state.email_outbox, state.razorpay_client)
+    bookings = make_booking_service(
+        db, settings, state.email_outbox, state.razorpay_client, state.sms_outbox
+    )
     return PaymentService(db, settings, bookings, state.razorpay_client)
 
 

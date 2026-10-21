@@ -59,6 +59,17 @@ class SignupRequest(APIModel):
         return self
 
 
+class CheckoutSignupRequest(APIModel):
+    """The four details a guest gives at checkout."""
+
+    first_name: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)
+    ]
+    last_name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=50)]
+    email: Email
+    phone: Phone
+
+
 class LoginRequest(APIModel):
     email: Email
     password: str = Field(min_length=1, max_length=128)

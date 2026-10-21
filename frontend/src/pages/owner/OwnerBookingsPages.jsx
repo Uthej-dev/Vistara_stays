@@ -186,13 +186,7 @@ export function OwnerBookingPage() {
               <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
                 <div>
                   <dt className="text-ink-600">Name</dt>
-                  <dd className="font-medium">
-                    {g.name}, {g.age}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-ink-600">Nationality</dt>
-                  <dd className="font-medium">{g.nationality}</dd>
+                  <dd className="font-medium">{g.name}</dd>
                 </div>
                 <div>
                   <dt className="text-ink-600">Phone</dt>

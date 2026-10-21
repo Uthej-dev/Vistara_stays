@@ -47,7 +47,7 @@ function ChildAges({ ages, onChange }) {
  */
 export default function BookingPanel({ resort, stayState, availability }) {
   const { stay, update, error } = stayState
-  const { status, user } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const today = todayIST()
   const ids = { in: useId(), out: useId(), room: useId() }
@@ -57,9 +57,8 @@ export default function BookingPanel({ resort, stayState, availability }) {
   const canBook = datesValid && selected?.bookable
 
   const reserve = () => {
-    const target = `/checkout?${stayQuery({ ...stay, roomTypeId: selected.room_type_id })}&resort=${resort.slug}`
-    if (status !== 'authenticated') navigate(`/login?next=${encodeURIComponent(target)}`)
-    else navigate(target)
+    // No login needed: guests give their details at checkout.
+    navigate(`/checkout?${stayQuery({ ...stay, roomTypeId: selected.room_type_id })}&resort=${resort.slug}`)
   }
 
   return (

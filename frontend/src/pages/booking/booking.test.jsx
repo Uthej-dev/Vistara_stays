@@ -19,7 +19,7 @@ const POLICY = { cancellation_policy: { tiers: [{ days_before_check_in: 7, refun
 const BOOKING = {
   id: 'b1', booking_ref: 'VS-ABC234', status: 'pending_payment', payment_status: 'unpaid', resort_id: 'r1', room_type_id: 'rt1',
   check_in: '2026-12-01', check_out: '2026-12-02', nights: 1, rooms: 1, guests: { adults: 2, children: 0, child_ages: [] },
-  guest_details: { name: 'Asha Rao', email: 'asha@example.com', phone: '+919876543210', age: 34, nationality: 'IN' },
+  guest_details: { first_name: 'Asha', last_name: 'Rao', name: 'Asha Rao', email: 'asha@example.com', phone: '+919876543210' },
   hold_expires_at: new Date(Date.now() + 10 * 60000).toISOString(), price: PRICE, policy_snapshot: POLICY,
   resort_snapshot: { name: 'Misty Fern Estate Stay', room_type_name: 'Garden Cottage', cover: null, is_sample: true },
   status_history: [], created_at: '2026-10-18T05:00:00Z', can_review: false,
@@ -29,13 +29,21 @@ const checkoutPath = '/checkout?check_in=2026-12-01&check_out=2026-12-02&rooms=1
 
 describe('checkout', () => {
   beforeEach(() => vi.mocked(catalog.getResort).mockResolvedValue(DETAIL))
+  const quoteOk = () => [200, { available: true, available_units: 3, price: PRICE, hold_minutes: 15 }]
+  const fillDetails = async (user, { email = 'meera@example.com' } = {}) => {
+    await user.type(screen.getByLabelText('First name'), 'Meera')
+    await user.type(screen.getByLabelText('Last name'), 'Nair')
+    await user.type(screen.getByLabelText('Email'), email)
+    await user.type(screen.getByLabelText('Mobile number'), '+919812345678')
+    await user.click(screen.getByRole('checkbox'))
+  }
 
-  it('creates the booking with an idempotency key and the lead guest’s details', async () => {
+  it('lets a visitor book without logging in: account is created from their details', async () => {
     const user = userEvent.setup()
     const calls = fakeServer({
-      'POST /auth/refresh': () => [200, session()],
+      'POST /bookings/quote': quoteOk,
+      'POST /auth/checkout-signup': () => [201, session({ ...USER, email: 'meera@example.com', name: 'Meera Nair', email_verified: false })],
       'GET /favourites/ids': () => [200, []],
-      'POST /bookings/quote': () => [200, { available: true, available_units: 3, price: PRICE, hold_minutes: 15 }],
       'POST /bookings': () => [201, BOOKING],
       'GET /bookings/b1': () => [200, BOOKING],
       'GET /payments/config': () => [200, { provider: 'simulated', simulated: true, razorpay_key_id: null }],
@@ -43,47 +51,66 @@ describe('checkout', () => {
     const { router } = renderApp(checkoutPath)
 
     expect(await screen.findByText('₹5,350')).toBeInTheDocument()
-    await user.type(screen.getByLabelText('Mobile number'), '+919876543210')
-    await user.type(screen.getByLabelText('Age'), '34')
-    await user.click(screen.getByRole('checkbox'))
-    await user.click(screen.getByRole('button', { name: /hold room/i }))
+    await fillDetails(user)
+    await user.click(screen.getByRole('button', { name: 'Continue to payment' }))
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/checkout/b1'))
+    const keys = calls.map((c) => c.key)
+    expect(keys.indexOf('POST /auth/checkout-signup')).toBeLessThan(keys.indexOf('POST /bookings'))
+    expect(calls.find((c) => c.key === 'POST /auth/checkout-signup').data).toEqual({ first_name: 'Meera', last_name: 'Nair', email: 'meera@example.com', phone: '+919812345678' })
     const create = calls.find((c) => c.key === 'POST /bookings')
     expect(create.config.headers['Idempotency-Key']).toMatch(/^[0-9a-f-]{36}$/)
-    expect(create.data).toMatchObject({ room_type_id: 'rt1', check_in: '2026-12-01', guest_details: { name: 'Asha Rao', age: 34, nationality: 'IN' } })
+    expect(create.data.guest_details).toEqual({ first_name: 'Meera', last_name: 'Nair', email: 'meera@example.com', phone: '+919812345678' })
     expect(create.data).not.toHaveProperty('total_paise')
-    expect(await screen.findByText(/Room held for/)).toBeInTheDocument()
   })
 
-  it('rejects an under-18 lead guest before calling the server', async () => {
+  it('asks for the password when the email already has an account', async () => {
     const user = userEvent.setup()
     const calls = fakeServer({
-      'POST /auth/refresh': () => [200, session()],
+      'POST /bookings/quote': quoteOk,
+      'POST /auth/checkout-signup': () => [409, { error: { code: 'ACCOUNT_EXISTS', message: 'You already have an account with this email.' } }],
+      'POST /auth/login': () => [200, session()],
       'GET /favourites/ids': () => [200, []],
-      'POST /bookings/quote': () => [200, { available: true, available_units: 3, price: PRICE, hold_minutes: 15 }],
+      'POST /bookings': () => [201, BOOKING],
+      'GET /bookings/b1': () => [200, BOOKING],
+      'GET /payments/config': () => [200, { provider: 'simulated', simulated: true, razorpay_key_id: null }],
     })
+    const { router } = renderApp(checkoutPath)
+    await screen.findByText('₹5,350')
+
+    await fillDetails(user, { email: 'asha@example.com' })
+    await user.click(screen.getByRole('button', { name: 'Continue to payment' }))
+    await user.type(await screen.findByLabelText('Password'), 'Correct-Horse-42')
+    await user.click(screen.getByRole('button', { name: 'Log in & continue to payment' }))
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/checkout/b1'))
+    expect(calls.find((c) => c.key === 'POST /auth/login').data).toEqual({ email: 'asha@example.com', password: 'Correct-Horse-42' })
+  })
+
+  it('validates the four details before contacting the server', async () => {
+    const user = userEvent.setup()
+    const calls = fakeServer({ 'POST /bookings/quote': quoteOk })
     renderApp(checkoutPath)
     await screen.findByText('₹5,350')
 
-    await user.type(screen.getByLabelText('Age'), '16')
-    await user.click(screen.getByRole('checkbox'))
-    await user.click(screen.getByRole('button', { name: /hold room/i }))
+    await user.click(screen.getByRole('button', { name: 'Continue to payment' }))
 
-    expect(await screen.findByText('The lead guest must be 18 or older')).toBeInTheDocument()
-    expect(calls.some((c) => c.key === 'POST /bookings')).toBe(false)
+    expect(await screen.findByText('Enter your first name')).toBeInTheDocument()
+    expect(screen.getByText('Enter your last name')).toBeInTheDocument()
+    expect(calls.some((c) => c.key === 'POST /auth/checkout-signup' || c.key === 'POST /bookings')).toBe(false)
   })
 
-  it('blocks booking until the email is verified', async () => {
+  it('prefills the details of a signed-in customer', async () => {
     fakeServer({
-      'POST /auth/refresh': () => [200, session({ ...USER, email_verified: false })],
+      'POST /auth/refresh': () => [200, session({ ...USER, phone: '+919876543210' })],
       'GET /favourites/ids': () => [200, []],
-      'POST /bookings/quote': () => [200, { available: true, available_units: 3, price: PRICE, hold_minutes: 15 }],
+      'POST /bookings/quote': quoteOk,
     })
     renderApp(checkoutPath)
 
-    expect(await screen.findByText(/Please verify your email before booking/)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /hold room/i })).toBeDisabled()
+    expect(await screen.findByDisplayValue('Asha')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Rao')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('+919876543210')).toBeInTheDocument()
   })
 })
 

@@ -19,11 +19,10 @@ pytestmark = pytest.mark.db
 API = "/api/v1"
 KEY_ID, KEY_SECRET, WEBHOOK_SECRET = "rzp_test_abc123", "test_key_secret_xyz", "test_webhook_secret"
 GUEST = {
-    "name": "Asha Rao",
+    "first_name": "Asha",
+    "last_name": "Rao",
     "email": "asha@example.com",
     "phone": "+919876543210",
-    "age": 34,
-    "nationality": "IN",
 }
 
 

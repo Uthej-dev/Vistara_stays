@@ -1,0 +1,14 @@
+.venv
+.env
+media
+tests
+.pytest_cache
+.ruff_cache
+htmlcov
+__pycache__
+pyproject.toml
+.env.local
+.mongo-test
+.coverage
+scripts
+requirements-dev.txt

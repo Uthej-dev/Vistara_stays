@@ -16,6 +16,7 @@ from app.core.errors import ForbiddenError
 from app.schemas.auth import (
     AuthResponse,
     ChangePasswordRequest,
+    CheckoutSignupRequest,
     ForgotPasswordRequest,
     LoginRequest,
     ResetPasswordRequest,
@@ -115,6 +116,24 @@ async def signup(
 ):
     """Create a customer or owner account and sign in. A verification email is sent."""
     return _respond(await svc.signup(body, request_meta(request)), response, settings)
+
+
+@router.post(
+    "/checkout-signup",
+    response_model=AuthResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[rate_limit("signup", 5, 60)],
+)
+async def checkout_signup(
+    body: CheckoutSignupRequest,
+    request: Request,
+    response: Response,
+    svc: AuthServiceDep,
+    settings: SettingsDep,
+):
+    """Book without signing up first: creates an account from first/last name, email and mobile
+    and signs the guest in. 409 ACCOUNT_EXISTS if the email is registered (log in instead)."""
+    return _respond(await svc.checkout_signup(body, request_meta(request)), response, settings)
 
 
 @router.post("/login", response_model=AuthResponse, dependencies=[rate_limit("login", 10, 60)])

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router'
-import { Building2, Heart, Menu, User, X } from 'lucide-react'
+import { Heart, Menu, User, X } from 'lucide-react'
 import Logo from './Logo'
 import { useCloseOnNavigate } from '../../hooks/useCloseOnNavigate'
 import UserMenu, { menuLinksFor } from './UserMenu'
@@ -69,13 +69,6 @@ export default function Navbar({ overlay = false }) {
         </ul>
 
         <div className="ml-auto hidden items-center gap-2 md:flex">
-          <NavLink
-            to="/owners"
-            className={cn('flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium', linkTone)}
-          >
-            <Building2 className="size-4" aria-hidden="true" />
-            List your property
-          </NavLink>
           {status === 'authenticated' ? (
             <>
               <NotificationBell transparent={transparent} />
@@ -110,7 +103,7 @@ export default function Navbar({ overlay = false }) {
       {menuOpen && (
         <div id="mobile-menu" className="border-t border-forest-900/5 bg-cream-50 px-4 pb-6 md:hidden">
           <ul className="flex flex-col py-2">
-            {[...LINKS, { to: '/owners', label: 'List your property' }].map(({ to, label }) => (
+            {LINKS.map(({ to, label }) => (
               <li key={to}>
                 <NavLink to={to} className="block rounded-lg px-2 py-3 text-base font-medium text-ink-900 hover:bg-forest-100">
                   {label}

@@ -31,7 +31,9 @@ def service(request: Request, db: DbDep) -> OwnerService:
 
 def bookings(request: Request, db: DbDep) -> BookingService:
     state = request.app.state
-    return make_booking_service(db, state.settings, state.email_outbox, state.razorpay_client)
+    return make_booking_service(
+        db, state.settings, state.email_outbox, state.razorpay_client, state.sms_outbox
+    )
 
 
 Svc = Annotated[OwnerService, Depends(service)]

@@ -46,8 +46,8 @@ Each requirement has an ID so tests and the checklist can reference it.
 - **B4** No overbooking under concurrent requests; idempotent submission.
 - **B5** Booking history, booking details, cancellation with policy-based refund calculation.
 - **B6** Booking stores a snapshot of price, taxes, guests, and cancellation policy.
-- **B7** Booking requires a **verified email**. Unverified users can search and get quotes, but `POST /bookings` returns 403 `EMAIL_NOT_VERIFIED` with a "resend verification" option.
-- **B8** Before booking, the customer must enter lead-guest details: full name, email, mobile number, age (must be 18+), and nationality. Estimated arrival time and special requests are optional; child ages are required when children are included. **ID numbers (Aadhaar, passport) are never collected online**; guests show a valid photo ID at check-in.
+- **B7** **No login before booking.** A visitor reserves straight from the resort page; at checkout their four details create a customer account (`POST /auth/checkout-signup`) and sign them in. An email that already has an account must log in with its password (409 `ACCOUNT_EXISTS`) — an email alone never signs anyone in. New accounts are passwordless and get a 7-day “set your password” link, which also verifies the email. Email verification before booking can be re-enabled with `REQUIRE_EMAIL_VERIFICATION=true`.
+- **B8** Lead-guest details are exactly **first name, last name, email and mobile number** (special requests optional; child ages required when children are included). After a successful payment the confirmation goes to that email **and** an SMS to that mobile number. **ID numbers (Aadhaar, passport) are never collected online**; guests show a valid photo ID at check-in.
 
 ### Reviews
 - **R1** Customer can review a resort once per completed booking.

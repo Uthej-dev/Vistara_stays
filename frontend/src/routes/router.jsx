@@ -125,11 +125,12 @@ export const routes = [
           { path: 'audit', element: page(L.AdminAuditPage) },
         ],
       },
+      // Checkout is open to everyone: guests create their account there.
+      { path: 'checkout', element: page(L.CheckoutPage) },
       {
         element: <RequireAuth roles={['customer']} />,
         children: [
           { path: 'favourites', element: <FavouritesPage /> },
-          { path: 'checkout', element: page(L.CheckoutPage) },
           { path: 'checkout/:bookingId', element: page(L.PaymentPage) },
           { path: 'trips', element: page(L.TripsPage) },
           { path: 'trips/:bookingId', element: page(L.TripPage) },

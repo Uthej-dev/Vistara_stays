@@ -24,14 +24,6 @@ const COLUMNS = [
     ],
   },
   {
-    title: 'For property owners',
-    links: [
-      { to: '/owners', label: 'List your property' },
-      { to: '/owners/register', label: 'Create an owner account' },
-      { to: '/owner', label: 'Owner dashboard' },
-    ],
-  },
-  {
     title: 'Policies',
     links: [
       { to: '/terms', label: 'Terms of use' },
@@ -60,7 +52,7 @@ export default function Footer() {
               hello@vistarastays.example
             </a>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             {COLUMNS.map((col) => (
               <nav key={col.title} aria-label={col.title}>
                 <h2 className="text-xs font-semibold tracking-[0.18em] text-cream-50 uppercase">{col.title}</h2>

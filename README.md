@@ -5,6 +5,8 @@ homestays across 25 destinations, with separate portals for property owners and 
 
 FastAPI · MongoDB (Atlas) · React 19 + Vite · Tailwind CSS · TanStack Query · Razorpay (test mode)
 
+**Live demo:** https://vistara-stays-pi.vercel.app (API: https://vistara-api-phi.vercel.app/api/docs)
+
 > **Portfolio project.** Every resort, owner, guest and review in the seed data is fictional and
 > labelled as a sample in the UI. Destination photos are real, credited Creative Commons images.
 
@@ -111,8 +113,8 @@ Details: [local setup guide](docs/08-local-setup.md).
 ## Tests
 
 ```bash
-cd backend && ./scripts/test_mongo.sh start && pytest --cov=app   # 222 tests, real replica set
-cd frontend && npm run lint && npm test                            # 79 tests
+cd backend && ./scripts/test_mongo.sh start && pytest --cov=app   # 233 tests, real replica set
+cd frontend && npm run lint && npm test                            # 80 tests
 cd e2e && npm install && ADMIN_PASSWORD=… npm test                 # 9 browser journeys (dev servers running)
 ```
 
@@ -121,7 +123,8 @@ What the tests prove, the manual checklist and the security checklist:
 
 ## Deploy
 
-GitHub → MongoDB Atlas → Render (`render.yaml`) → Vercel (`frontend/vercel.json`), with CI in
+The live demo runs the website and the API as two Vercel projects (`frontend/vercel.json`,
+`backend/vercel.json`); a Render blueprint (`render.yaml`) is also included. CI is in
 `.github/workflows/ci.yml`. Step by step: [deployment guide](docs/11-deployment.md).
 
 ## Documentation

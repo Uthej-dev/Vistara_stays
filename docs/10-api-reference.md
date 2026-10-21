@@ -51,6 +51,7 @@ Error format, pagination and money conventions: see [05-api-spec.md](05-api-spec
 | Method | Path | Access | Purpose |
 |---|---|---|---|
 | POST | `/api/v1/auth/change-password` | any signed-in user | Change password; signs out other devices but keeps this one signed in. |
+| POST | `/api/v1/auth/checkout-signup` | public | Book without signing up first: creates an account from first/last name, email and mobile and signs the guest in. 409 ACCOUNT_EXISTS if the email is registered (log in instead). |
 | POST | `/api/v1/auth/forgot-password` | public | Always 202, whether or not the email has an account. |
 | POST | `/api/v1/auth/login` | public | login |
 | POST | `/api/v1/auth/logout` | refresh cookie + same-site headers | logout |

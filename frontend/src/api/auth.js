@@ -19,3 +19,4 @@ export const getFavouriteIds = () => apiClient.get('/favourites/ids').then((r) =
 export const getFavourites = (page = 1) => apiClient.get('/favourites', { params: { page, page_size: 12 } }).then((r) => r.data)
 export const addFavourite = (resortId) => apiClient.put(`/favourites/${resortId}`)
 export const removeFavourite = (resortId) => apiClient.delete(`/favourites/${resortId}`)
+export const checkoutSignup = (body) => apiClient.post('/auth/checkout-signup', body).then((r) => r.data)
