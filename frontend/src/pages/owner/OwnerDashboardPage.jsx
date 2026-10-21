@@ -11,7 +11,7 @@ import { formatDate } from '../../utils/dates'
 import { plural } from '../../utils/format'
 import { RESORT_STATUS_LABELS } from '../../utils/labels'
 
-const compactINR = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', notation: 'compact', maximumFractionDigits: 1 })
+const compactINR = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', notation: 'compact', minimumFractionDigits: 0, maximumFractionDigits: 1 })
 
 export default function OwnerDashboardPage() {
   const { data, isPending, error, refetch } = useQuery({ queryKey: ['owner', 'dashboard'], queryFn: ownerApi.dashboard })

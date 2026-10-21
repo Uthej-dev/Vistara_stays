@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router'
-import { CalendarRange, Hotel, LayoutDashboard, MessageSquare, ClipboardList } from 'lucide-react'
+import { CalendarRange, ClipboardList, Hotel, LayoutDashboard, MessageSquare, Star } from 'lucide-react'
 import { Container } from '../../components/ui/Section'
 import { cn } from '../../utils/cn'
 
@@ -8,6 +8,7 @@ const LINKS = [
   { to: '/owner/resorts', label: 'Properties', icon: Hotel },
   { to: '/owner/bookings', label: 'Reservations', icon: ClipboardList },
   { to: '/owner/calendar', label: 'Rates & availability', icon: CalendarRange },
+  { to: '/owner/reviews', label: 'Reviews', icon: Star },
   { to: '/owner/enquiries', label: 'Enquiries', icon: MessageSquare },
 ]
 

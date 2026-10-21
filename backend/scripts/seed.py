@@ -11,6 +11,7 @@ Sample account password: SEED_PASSWORD env var (default below — development on
 
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 import random
@@ -27,6 +28,7 @@ from app.utils.geo import geo_point, haversine_km
 from scripts.seed_data.attractions import ATTRACTIONS
 from scripts.seed_data.destinations import CATEGORIES, DESTINATIONS
 from scripts.seed_data.resorts import RESORTS, ROOM_TEMPLATES, SAMPLE_OWNERS
+from scripts.seed_data.reviews import GOOD, GREAT, MIXED, SAMPLE_GUESTS
 
 DEFAULT_SEED_PASSWORD = "Vistara#Demo2026"
 NOT_FEATURED = 1000
@@ -313,6 +315,140 @@ async def seed_resorts(db, owners: list[dict], destinations: dict) -> int:
     return len(RESORTS)
 
 
+async def seed_reviews(db, password_hash: str) -> int:
+    """Completed sample stays + sample reviews, so ratings come from real review data paths."""
+    from datetime import timedelta
+
+    from app.services.review_service import public_author, recompute_rating
+    from app.utils.dates import today_ist
+
+    guests = []
+    for name, email in SAMPLE_GUESTS:
+        guests.append(
+            await upsert(
+                db["users"],
+                {"email": email},
+                {
+                    "name": name.replace("Sample Guest ", ""),
+                    "role": Role.CUSTOMER,
+                    "status": UserStatus.ACTIVE,
+                    "email_verified": True,
+                    "password_hash": password_hash,
+                    "token_version": 0,
+                    "is_sample": True,
+                },
+            )
+        )
+    # Sample stays/reviews are regenerated from scratch each run (deterministically), so
+    # changes to the generator never leave stale sample reviews behind.
+    stale = await db["bookings"].distinct(
+        "_id", {"booking_ref": {"$regex": "^VS-S"}, "is_sample": True}
+    )
+    await db["reviews"].delete_many({"booking_id": {"$in": stale}})
+    await db["bookings"].delete_many({"_id": {"$in": stale}})
+    created = 0
+    resorts = (
+        await db["resorts"]
+        .find({"is_sample": True, "status": ResortStatus.PUBLISHED})
+        .to_list(None)
+    )
+    for resort in resorts:
+        rng = random.Random("reviews-" + resort["slug"])
+        rooms = await db["room_types"].find({"resort_id": resort["_id"]}).to_list(None)
+        # Each resort gets distinct review texts (no repeated wording within one property).
+        texts = (
+            [(text, rng.choice([5, 5, 4])) for text in GREAT]
+            + [(text, 4) for text in GOOD]
+            + [(text, 3) for text in MIXED]
+        )
+        rng.shuffle(texts)
+        for i in range(rng.randint(3, 6)):
+            guest = guests[(i + rng.randint(0, 5)) % len(guests)]
+            # Stable across runs (unlike hash()), so re-seeding updates instead of duplicating.
+            digest = hashlib.sha1(f"{resort['slug']}:{i}".encode()).hexdigest()[:8].upper()
+            ref = f"VS-S{digest}"
+            (title, body), rating = texts[i]
+            room = rng.choice(rooms)
+            check_in = today_ist() - timedelta(days=rng.randint(20, 300))
+            nights = rng.randint(1, 3)
+            booking = await upsert(
+                db["bookings"],
+                {"booking_ref": ref},
+                {
+                    "user_id": guest["_id"],
+                    "resort_id": resort["_id"],
+                    "room_type_id": room["_id"],
+                    "owner_id": resort["owner_id"],
+                    "check_in": check_in.isoformat(),
+                    "check_out": (check_in + timedelta(days=nights)).isoformat(),
+                    "nights": nights,
+                    "night_dates": [],
+                    "rooms": 1,
+                    "guests": {"adults": 2, "children": 0, "child_ages": []},
+                    "guest_details": {
+                        "name": guest["name"],
+                        "email": guest["email"],
+                        "phone": "+919000000000",
+                        "age": 30,
+                        "nationality": "IN",
+                    },
+                    "status": "completed",
+                    "payment_status": "paid",
+                    "hold_expires_at": now_utc(),
+                    "inventory_released": True,
+                    "price": {
+                        "total_paise": room["base_rate_paise"] * nights,
+                        "service_fee_paise": 0,
+                        "taxable_paise": room["base_rate_paise"] * nights,
+                        "nights": [],
+                        "taxes": [],
+                        "meal_plan": room["meal_plan"],
+                    },
+                    "policy_snapshot": {
+                        "cancellation_policy": resort["policies"]["cancellation_policy"],
+                        "check_in_time": "14:00",
+                        "check_out_time": "11:00",
+                    },
+                    "resort_snapshot": {
+                        "name": resort["name"],
+                        "slug": resort["slug"],
+                        "room_type_name": room["name"],
+                        "is_sample": True,
+                    },
+                    "idempotency_key": f"sample-{ref}",
+                    "request_hash": "sample",
+                    "is_sample": True,
+                    "status_history": [],
+                },
+            )
+            subs = {
+                k: max(1, min(5, rating + rng.choice([-1, 0, 0, 1])))
+                for k in ("cleanliness", "location", "service", "facilities")
+            }
+            await upsert(
+                db["reviews"],
+                {"booking_id": booking["_id"]},
+                {
+                    "user_id": guest["_id"],
+                    "resort_id": resort["_id"],
+                    "rating": rating,
+                    "sub_ratings": subs,
+                    "title": title,
+                    "body": body,
+                    "author_display": public_author(guest["name"]),
+                    "stay_month": check_in.isoformat()[:7],
+                    "room_type_name": room["name"],
+                    "status": "published",
+                    "report_count": 0,
+                    "owner_reply": None,
+                    "is_sample": True,
+                },
+            )
+            created += 1
+        await recompute_rating(db, resort["_id"])
+    return created
+
+
 async def reset_samples(db) -> None:
     sample_resort_ids = await db["resorts"].distinct("_id", {"is_sample": True})
     for name in (
@@ -351,10 +487,11 @@ async def main(reset: bool) -> None:
         password = os.environ.get("SEED_PASSWORD", DEFAULT_SEED_PASSWORD)
         owners = await seed_users(db, hash_password(password))
         count = await seed_resorts(db, owners, destinations)
+        reviews = await seed_reviews(db, hash_password(password))
         print(
             f"Seeded into '{settings.mongodb_db}': {len(destinations)} destinations, "
             f"{len(CATEGORIES)} categories, {len(owners)} sample owners, 1 demo customer, "
-            f"{count} fictional resorts."
+            f"{count} fictional resorts, {reviews} sample reviews."
         )
         print(
             f"Sample logins (password: {'SEED_PASSWORD' if 'SEED_PASSWORD' in os.environ else DEFAULT_SEED_PASSWORD}): "

@@ -15,15 +15,49 @@ import FavouritesPage from '../pages/FavouritesPage'
 import RequireAuth from '../features/auth/RequireAuth'
 import ResortPage from '../pages/ResortPage'
 import OwnersLandingPage from '../pages/OwnersLandingPage'
-import OwnerShell from '../features/owner/OwnerShell'
-import OwnerDashboardPage from '../pages/owner/OwnerDashboardPage'
-import OwnerResortsPage from '../pages/owner/OwnerResortsPage'
-import ResortEditorPage from '../pages/owner/ResortEditorPage'
-import OwnerCalendarPage from '../pages/owner/OwnerCalendarPage'
-import { OwnerBookingPage, OwnerBookingsPage, OwnerEnquiriesPage } from '../pages/owner/OwnerBookingsPages'
-import CheckoutPage from '../pages/booking/CheckoutPage'
-import PaymentPage from '../pages/booking/PaymentPage'
-import { TripPage, TripsPage } from '../pages/booking/TripsPages'
+import { lazy, Suspense } from 'react'
+import { FullPageSpinner } from '../features/auth/RequireAuth'
+
+
+
+// Portals and checkout are split into separate chunks: visitors browsing stays never download them.
+const named = (loader, name) => lazy(() => loader().then((m) => ({ default: m[name] })))
+const ownerPages = () => import('../pages/owner/OwnerBookingsPages')
+const adminPages = () => import('../pages/admin/AdminPages')
+const adminContent = () => import('../pages/admin/AdminContentPages')
+const tripPages = () => import('../pages/booking/TripsPages')
+const L = {
+  OwnerShell: lazy(() => import('../features/owner/OwnerShell')),
+  OwnerDashboardPage: lazy(() => import('../pages/owner/OwnerDashboardPage')),
+  OwnerResortsPage: lazy(() => import('../pages/owner/OwnerResortsPage')),
+  ResortEditorPage: lazy(() => import('../pages/owner/ResortEditorPage')),
+  OwnerCalendarPage: lazy(() => import('../pages/owner/OwnerCalendarPage')),
+  OwnerReviewsPage: lazy(() => import('../pages/owner/OwnerReviewsPage')),
+  OwnerBookingsPage: named(ownerPages, 'OwnerBookingsPage'),
+  OwnerBookingPage: named(ownerPages, 'OwnerBookingPage'),
+  OwnerEnquiriesPage: named(ownerPages, 'OwnerEnquiriesPage'),
+  AdminShell: lazy(() => import('../features/admin/AdminShell')),
+  AdminOverviewPage: named(adminPages, 'AdminOverviewPage'),
+  AdminResortsPage: named(adminPages, 'AdminResortsPage'),
+  AdminResortPage: named(adminPages, 'AdminResortPage'),
+  AdminUsersPage: named(adminPages, 'AdminUsersPage'),
+  AdminBookingsPage: named(adminPages, 'AdminBookingsPage'),
+  AdminBookingPage: named(adminPages, 'AdminBookingPage'),
+  AdminReviewsPage: named(adminContent, 'AdminReviewsPage'),
+  AdminDestinationsPage: named(adminContent, 'AdminDestinationsPage'),
+  AdminCouponsPage: named(adminContent, 'AdminCouponsPage'),
+  AdminSettingsPage: named(adminContent, 'AdminSettingsPage'),
+  AdminAuditPage: named(adminContent, 'AdminAuditPage'),
+  CheckoutPage: lazy(() => import('../pages/booking/CheckoutPage')),
+  PaymentPage: lazy(() => import('../pages/booking/PaymentPage')),
+  TripsPage: named(tripPages, 'TripsPage'),
+  TripPage: named(tripPages, 'TripPage'),
+}
+const page = (Component) => (
+  <Suspense fallback={<FullPageSpinner />}>
+    <Component />
+  </Suspense>
+)
 
 // Routes that later phases implement. Listed here so every link in the UI resolves.
 const UPCOMING = [
@@ -45,7 +79,7 @@ export const routes = [
       { path: 'destinations', element: <DestinationsPage /> },
       { path: 'destinations/:slug', element: <DestinationPage /> },
       { path: 'resorts/:slug', element: <ResortPage /> },
-      { path: 'owners', element: <OwnersLandingPage /> },
+      { path: 'owners', element: page(L.OwnersLandingPage) },
       { path: 'login', element: <LoginPage /> },
       { path: 'signup', element: <SignupPage /> },
       { path: 'owners/register', element: <SignupPage accountType="owner" /> },
@@ -59,28 +93,46 @@ export const routes = [
       {
         path: 'owner',
         element: (
-          <RequireAuth roles={['owner']}>
-            <OwnerShell />
-          </RequireAuth>
+          <RequireAuth roles={['owner']}>{page(L.OwnerShell)}</RequireAuth>
         ),
         children: [
-          { index: true, element: <OwnerDashboardPage /> },
-          { path: 'resorts', element: <OwnerResortsPage /> },
-          { path: 'resorts/:resortId', element: <ResortEditorPage /> },
-          { path: 'calendar', element: <OwnerCalendarPage /> },
-          { path: 'bookings', element: <OwnerBookingsPage /> },
-          { path: 'bookings/:bookingId', element: <OwnerBookingPage /> },
-          { path: 'enquiries', element: <OwnerEnquiriesPage /> },
+          { index: true, element: page(L.OwnerDashboardPage) },
+          { path: 'resorts', element: page(L.OwnerResortsPage) },
+          { path: 'resorts/:resortId', element: page(L.ResortEditorPage) },
+          { path: 'calendar', element: page(L.OwnerCalendarPage) },
+          { path: 'bookings', element: page(L.OwnerBookingsPage) },
+          { path: 'bookings/:bookingId', element: page(L.OwnerBookingPage) },
+          { path: 'reviews', element: page(L.OwnerReviewsPage) },
+          { path: 'enquiries', element: page(L.OwnerEnquiriesPage) },
+        ],
+      },
+      {
+        path: 'admin',
+        element: (
+          <RequireAuth roles={['admin']}>{page(L.AdminShell)}</RequireAuth>
+        ),
+        children: [
+          { index: true, element: page(L.AdminOverviewPage) },
+          { path: 'resorts', element: page(L.AdminResortsPage) },
+          { path: 'resorts/:resortId', element: page(L.AdminResortPage) },
+          { path: 'users', element: page(L.AdminUsersPage) },
+          { path: 'bookings', element: page(L.AdminBookingsPage) },
+          { path: 'bookings/:bookingId', element: page(L.AdminBookingPage) },
+          { path: 'reviews', element: page(L.AdminReviewsPage) },
+          { path: 'destinations', element: page(L.AdminDestinationsPage) },
+          { path: 'coupons', element: page(L.AdminCouponsPage) },
+          { path: 'settings', element: page(L.AdminSettingsPage) },
+          { path: 'audit', element: page(L.AdminAuditPage) },
         ],
       },
       {
         element: <RequireAuth roles={['customer']} />,
         children: [
           { path: 'favourites', element: <FavouritesPage /> },
-          { path: 'checkout', element: <CheckoutPage /> },
-          { path: 'checkout/:bookingId', element: <PaymentPage /> },
-          { path: 'trips', element: <TripsPage /> },
-          { path: 'trips/:bookingId', element: <TripPage /> },
+          { path: 'checkout', element: page(L.CheckoutPage) },
+          { path: 'checkout/:bookingId', element: page(L.PaymentPage) },
+          { path: 'trips', element: page(L.TripsPage) },
+          { path: 'trips/:bookingId', element: page(L.TripPage) },
         ],
       },
       ...UPCOMING.map(({ path, title, phase }) => ({

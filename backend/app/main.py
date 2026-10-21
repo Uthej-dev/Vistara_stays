@@ -14,7 +14,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api.routes import admin, auth, bookings, catalog, health, owner, stays, uploads, users
+from app.api.routes import (
+    admin,
+    auth,
+    bookings,
+    catalog,
+    health,
+    owner,
+    reviews,
+    stays,
+    uploads,
+    users,
+)
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
 from app.core.logging import RequestContextMiddleware, configure_logging
@@ -109,6 +120,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         auth.router,
         users.router,
         owner.router,
+        reviews.router,
         uploads.router,
         admin.router,
     ):
