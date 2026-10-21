@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+/* Design tokens. Tailwind v4 turns each --color-* into utilities: bg-forest-800, text-cream-50 ... */
+@theme {
+  --color-forest-950: #0f1f16;
+  --color-forest-900: #16301f;
+  --color-forest-800: #1f3d2b;
+  --color-forest-700: #2a5239;
+  --color-forest-600: #376a4a;
+  --color-forest-100: #e3ece5;
+
+  --color-cream-50: #fbf8f1;
+  --color-cream-100: #f5efe1;
+  --color-cream-200: #ebe1c8;
+
+  --color-clay-500: #b0693f;
+  --color-clay-600: #94552f;
+
+  --color-ink-900: #1c1f1d;
+  --color-ink-600: #4c534f;
+}
+
+@layer base {
+  body {
+    @apply bg-cream-50 text-ink-900 antialiased;
+  }
+  /* Visible keyboard focus everywhere (accessibility requirement). */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-clay-500;
+  }
+}
