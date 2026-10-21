@@ -3,6 +3,7 @@ import { NavLink, useLocation } from 'react-router'
 import { Building2, Heart, Menu, User, X } from 'lucide-react'
 import Logo from './Logo'
 import UserMenu, { menuLinksFor } from './UserMenu'
+import NotificationBell from './NotificationBell'
 import { useAuth } from '../../features/auth/AuthProvider'
 import { cn } from '../../utils/cn'
 
@@ -76,7 +77,10 @@ export default function Navbar({ overlay = false }) {
             List your property
           </NavLink>
           {status === 'authenticated' ? (
-            <UserMenu user={user} onLogout={logout} transparent={transparent} />
+            <>
+              <NotificationBell transparent={transparent} />
+              <UserMenu user={user} onLogout={logout} transparent={transparent} />
+            </>
           ) : (
             <NavLink
               to="/login"

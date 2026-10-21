@@ -16,8 +16,9 @@ from app.schemas.destinations import (
 )
 from app.schemas.owner import OptionalReason
 from app.services.admin_service import AdminService
-from app.services.booking_service import BookingService, booking_out
+from app.services.booking_service import booking_out
 from app.services.email_service import EmailService
+from app.services.factories import make_booking_service
 from app.services.moderation_service import ModerationService
 from app.services.platform_settings import get_platform_settings
 from app.services.review_service import ReviewService
@@ -135,9 +136,8 @@ async def cancel_booking(
     doc = await db["bookings"].find_one({"_id": oid(booking_id)})
     if not doc:
         raise NotFoundError("Booking not found.")
-    engine = BookingService(
-        db, EmailService(request.app.state.settings, request.app.state.email_outbox)
-    )
+    state = request.app.state
+    engine = make_booking_service(db, state.settings, state.email_outbox, state.razorpay_client)
     return booking_out(
         await engine.cancel(doc, actor=admin, reason=body.reason), include_preview=False
     )

@@ -67,7 +67,12 @@ def refund_for(booking: dict, today, *, full: bool = False) -> dict:
 
 
 class BookingService:
-    def __init__(self, db: AsyncDatabase, email: EmailService | None = None, settings=None):
+    def __init__(
+        self, db: AsyncDatabase, email: EmailService | None = None, settings=None, refunder=None
+    ):
+        """`refunder(booking_id, amount_paise, reason)` asks the payment provider for a refund;
+        it's set when real payments (Razorpay) are enabled."""
+        self.refunder = refunder
         self.db = db
         self.client = db.client
         self.bookings = db["bookings"]
@@ -410,12 +415,18 @@ class BookingService:
             )
         return len(stale)
 
-    async def mark_paid(self, booking: dict, payment: dict) -> dict:
-        """Payment captured (simulated or verified by the provider) → confirm or await owner."""
-        if (
+    async def mark_paid(self, booking: dict, payment: dict, *, allow_late: bool = False) -> dict:
+        """Payment captured (simulated or verified by the provider) → confirm or await owner.
+
+        `allow_late` is for REAL money: if the hold already expired we try to re-reserve the
+        room; if it's gone the booking is cancelled and the caller refunds in full."""
+        late = booking["status"] == BookingStatus.EXPIRED or (
             booking["status"] == BookingStatus.PENDING_PAYMENT
             and booking["hold_expires_at"] <= now_utc()
-        ):
+        )
+        if late and allow_late:
+            return await self._paid_after_expiry(booking, payment)
+        if late:
             await self.expire(booking["_id"])
             raise ConflictError(
                 "Your hold expired before payment completed. You haven't been charged.",
@@ -464,7 +475,130 @@ class BookingService:
                 return current  # duplicate confirmation (e.g. webhook retry) — already done
             raise ConflictError("This booking can no longer be paid.", code="INVALID_STATE")
         await self._notify_booking(updated, "confirmed" if instant else "requested")
+        await self._notify_owner(updated)
         return updated
+
+    async def _paid_after_expiry(self, booking: dict, payment: dict) -> dict:
+        if booking["status"] == BookingStatus.PENDING_PAYMENT:
+            await self.expire(booking["_id"])  # give the rooms back first, then try to retake them
+        booking = await self.bookings.find_one({"_id": booking["_id"]})
+        if booking["status"] != BookingStatus.EXPIRED:
+            raise ConflictError("This booking can no longer be paid.", code="INVALID_STATE")
+        room = await self.db["room_types"].find_one({"_id": booking["room_type_id"]})
+        nights = [parse_date(d) for d in booking["night_dates"]]
+        instant = (
+            booking["policy_snapshot"].get("booking_mode", BookingMode.INSTANT)
+            == BookingMode.INSTANT
+        )
+        target = BookingStatus.CONFIRMED if instant else BookingStatus.PENDING_OWNER
+        now = now_utc()
+        await self.inventory.ensure_nights(room, nights)
+
+        async def run(session):
+            await self.inventory.reserve(room["_id"], nights, booking["rooms"], session)
+            updated = await self.bookings.find_one_and_update(
+                {"_id": booking["_id"], "status": BookingStatus.EXPIRED},
+                {
+                    "$set": {
+                        "status": target,
+                        "inventory_released": False,
+                        "payment_status": PaymentStatus.PAID,
+                        "paid_at": now,
+                        "payment": payment,
+                        "updated_at": now,
+                    },
+                    "$push": {
+                        "status_history": {
+                            "status": target,
+                            "at": now,
+                            "by": "payment_after_expiry",
+                        }
+                    },
+                },
+                return_document=True,
+                session=session,
+            )
+            if not updated:
+                raise ConflictError("This booking can no longer be paid.", code="INVALID_STATE")
+            return updated
+
+        try:
+            updated = await self._txn(run)
+        except ConflictError as exc:
+            if exc.code != "ROOM_UNAVAILABLE":
+                raise
+            refund = refund_for(
+                {**booking, "payment_status": PaymentStatus.PAID}, today_ist(), full=True
+            )
+            await self.bookings.update_one(
+                {"_id": booking["_id"], "status": BookingStatus.EXPIRED},
+                {
+                    "$set": {
+                        "status": BookingStatus.CANCELLED,
+                        "payment_status": PaymentStatus.PAID,
+                        "payment": payment,
+                        "cancellation": {
+                            "cancelled_at": now,
+                            "by": "system",
+                            "actor_id": None,
+                            "reason": "Payment arrived after the hold expired and the room was no longer available.",
+                            **refund,
+                            "refund_status": "pending",
+                        },
+                    },
+                    "$push": {
+                        "status_history": {
+                            "status": BookingStatus.CANCELLED,
+                            "at": now,
+                            "by": "system",
+                        }
+                    },
+                },
+            )
+            raise ConflictError(
+                "Your payment arrived after the room was released and it's no longer available. "
+                "You'll receive a full refund.",
+                code="HOLD_LOST",
+            ) from exc
+        await self._notify_booking(updated, "confirmed" if instant else "requested")
+        await self._notify_owner(updated)
+        return updated
+
+    async def _refund_if_real(self, booking: dict, refund_paise: int, reason: str) -> None:
+        if (
+            self.refunder
+            and (booking.get("payment") or {}).get("provider") == "razorpay"
+            and refund_paise > 0
+        ):
+            await self.refunder(booking["_id"], refund_paise, reason)
+
+    async def _notify_owner(self, booking: dict) -> None:
+        snap = booking["resort_snapshot"]
+        title = (
+            "New booking request — please confirm"
+            if booking["status"] == BookingStatus.PENDING_OWNER
+            else "New confirmed booking"
+        )
+        await self.db["notifications"].insert_one(
+            {
+                "user_id": booking["owner_id"],
+                "type": "owner.booking",
+                "title": title,
+                "body": f"{snap['name']} · {booking['check_in']} → {booking['check_out']} · {booking['booking_ref']}",
+                "link": f"/owner/bookings/{booking['_id']}",
+                "read_at": None,
+                "created_at": now_utc(),
+            }
+        )
+        contact = (snap.get("contact") or {}).get("email")
+        if self.email and contact:
+            await self.email.send_notification(
+                contact,
+                f"{title}: {booking['booking_ref']}",
+                f"{title} at {snap['name']} ({snap['room_type_name']}).\nStay: {booking['check_in']} to {booking['check_out']}.\n"
+                "Guest details are in your owner dashboard.",
+                "owner.booking",
+            )
 
     async def cancel(self, booking: dict, *, actor: dict, reason: str | None) -> dict:
         today = today_ist()
@@ -535,8 +669,9 @@ class BookingService:
                 code="INVALID_STATE",
             )
         if booking["payment_status"] == PaymentStatus.PAID:
+            await self._refund_if_real(updated, cancellation["refund_paise"], reason or "cancelled")
             await self._notify_booking(updated, "cancelled")
-        return updated
+        return await self.bookings.find_one({"_id": booking["_id"]})
 
     def _is_simulated(self, booking: dict) -> bool:
         return (booking.get("payment") or {}).get("provider") == "simulated"
@@ -605,8 +740,9 @@ class BookingService:
             raise BusinessRuleError(
                 "Only bookings awaiting your confirmation can be declined.", code="INVALID_STATE"
             )
+        await self._refund_if_real(updated, refund["refund_paise"], "declined by property")
         await self._notify_booking(updated, "rejected")
-        return updated
+        return await self.bookings.find_one({"_id": booking_id})
 
     async def owner_no_show(self, booking_id: ObjectId, actor: dict) -> dict:
         booking = await self.bookings.find_one({"_id": booking_id})

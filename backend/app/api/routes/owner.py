@@ -19,7 +19,7 @@ from app.schemas.owner import (
     RoomTypeUpdate,
 )
 from app.services.booking_service import BookingService
-from app.services.email_service import EmailService
+from app.services.factories import make_booking_service
 from app.services.owner_service import OwnerService, owner_booking_out
 
 router = APIRouter(prefix="/owner", tags=["owner"])
@@ -30,8 +30,8 @@ def service(request: Request, db: DbDep) -> OwnerService:
 
 
 def bookings(request: Request, db: DbDep) -> BookingService:
-    settings = request.app.state.settings
-    return BookingService(db, EmailService(settings, request.app.state.email_outbox), settings)
+    state = request.app.state
+    return make_booking_service(db, state.settings, state.email_outbox, state.razorpay_client)
 
 
 Svc = Annotated[OwnerService, Depends(service)]

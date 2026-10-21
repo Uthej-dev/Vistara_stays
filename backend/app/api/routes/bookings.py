@@ -9,7 +9,7 @@ from app.core.errors import NotFoundError
 from app.schemas.bookings import BookingCreate, BookingOut, BookingPage, CancelRequest
 from app.schemas.common import IdPath, Pagination, oid, pagination_params
 from app.services.booking_service import BookingService, booking_out
-from app.services.email_service import EmailService
+from app.services.factories import make_booking_service
 
 router = APIRouter(tags=["bookings"])
 
@@ -25,8 +25,8 @@ IdempotencyKey = Annotated[
 
 
 def get_booking_service(request: Request, db: DbDep) -> BookingService:
-    settings = request.app.state.settings
-    return BookingService(db, EmailService(settings, request.app.state.email_outbox), settings)
+    state = request.app.state
+    return make_booking_service(db, state.settings, state.email_outbox, state.razorpay_client)
 
 
 BookingServiceDep = Annotated[BookingService, Depends(get_booking_service)]

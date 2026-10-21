@@ -20,7 +20,9 @@ from app.api.routes import (
     bookings,
     catalog,
     health,
+    notifications,
     owner,
+    payments,
     reviews,
     stays,
     uploads,
@@ -41,13 +43,13 @@ async def run_maintenance(db, settings: Settings) -> None:
     """While the server is awake: expire unpaid holds, complete finished stays, decline
     unanswered booking requests. Correctness never depends on this loop — the same work also
     happens lazily whenever the affected data is read or booked."""
-    from app.services.booking_service import BookingService
+    from app.services.factories import make_booking_service
     from app.services.platform_settings import get_platform_settings
 
     while True:
         await asyncio.sleep(settings.maintenance_interval_seconds)
         try:
-            svc = BookingService(db)
+            svc = make_booking_service(db, settings)
             platform = await get_platform_settings(db)
             expired = await svc.release_expired_holds()
             completed = await svc.complete_stays()
@@ -111,6 +113,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.settings = settings
     app.state.rate_limiter = RateLimiter()
     app.state.email_outbox = []  # console email backend keeps recent emails here
+    app.state.razorpay_client = None  # tests inject a fake; None = real client from settings
     register_exception_handlers(app)
     for router in (
         health.router,
@@ -121,6 +124,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         users.router,
         owner.router,
         reviews.router,
+        payments.router,
+        notifications.router,
         uploads.router,
         admin.router,
     ):
