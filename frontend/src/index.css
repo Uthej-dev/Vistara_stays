@@ -2,6 +2,9 @@
 
 /* Design tokens. Tailwind v4 turns each --color-* into utilities: bg-forest-800, text-cream-50 ... */
 @theme {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+
   --color-forest-950: #0f1f16;
   --color-forest-900: #16301f;
   --color-forest-800: #1f3d2b;
@@ -27,5 +30,16 @@
   /* Visible keyboard focus everywhere (accessibility requirement). */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-clay-500;
+  }
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

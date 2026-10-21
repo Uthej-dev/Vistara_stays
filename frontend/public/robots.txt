@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /owner
+Disallow: /admin
+Disallow: /trips
+Disallow: /checkout
