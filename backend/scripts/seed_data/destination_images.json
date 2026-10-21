@@ -1,11 +1,11 @@
 {
   "araku-valley": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Araku_Valley_from_Galikonda_View_Point_02.jpg/1280px-Araku_Valley_from_Galikonda_View_Point_02.jpg",
+    "src": "/photos/araku-valley-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Araku_Valley_from_Galikonda_View_Point_02.jpg/500px-Araku_Valley_from_Galikonda_View_Point_02.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Araku_Valley_from_Galikonda_View_Point_02.jpg/960px-Araku_Valley_from_Galikonda_View_Point_02.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Araku_Valley_from_Galikonda_View_Point_02.jpg/1280px-Araku_Valley_from_Galikonda_View_Point_02.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Araku_Valley_from_Galikonda_View_Point_02.jpg/1920px-Araku_Valley_from_Galikonda_View_Point_02.jpg"
+      "500": "/photos/araku-valley-500.jpg",
+      "960": "/photos/araku-valley-960.jpg",
+      "1280": "/photos/araku-valley-1280.jpg",
+      "1920": "/photos/araku-valley-1920.jpg"
     },
     "width": 4000,
     "height": 3000,
@@ -18,12 +18,12 @@
     "alt": "Green hills of Araku Valley seen from the Galikonda viewpoint"
   },
   "lambasingi": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Valley_near_lambasinghi.jpg/1280px-Valley_near_lambasinghi.jpg",
+    "src": "/photos/lambasingi-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Valley_near_lambasinghi.jpg/500px-Valley_near_lambasinghi.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Valley_near_lambasinghi.jpg/960px-Valley_near_lambasinghi.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Valley_near_lambasinghi.jpg/1280px-Valley_near_lambasinghi.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Valley_near_lambasinghi.jpg/1920px-Valley_near_lambasinghi.jpg"
+      "500": "/photos/lambasingi-500.jpg",
+      "960": "/photos/lambasingi-960.jpg",
+      "1280": "/photos/lambasingi-1280.jpg",
+      "1920": "/photos/lambasingi-1920.jpg"
     },
     "width": 4032,
     "height": 3024,
@@ -36,12 +36,12 @@
     "alt": "A valley near Lambasingi in the Eastern Ghats"
   },
   "horsley-hills": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Horsley_hills_HDR.jpg/1280px-Horsley_hills_HDR.jpg",
+    "src": "/photos/horsley-hills-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Horsley_hills_HDR.jpg/500px-Horsley_hills_HDR.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Horsley_hills_HDR.jpg/960px-Horsley_hills_HDR.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Horsley_hills_HDR.jpg/1280px-Horsley_hills_HDR.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/73/Horsley_hills_HDR.jpg/1920px-Horsley_hills_HDR.jpg"
+      "500": "/photos/horsley-hills-500.jpg",
+      "960": "/photos/horsley-hills-960.jpg",
+      "1280": "/photos/horsley-hills-1280.jpg",
+      "1920": "/photos/horsley-hills-1920.jpg"
     },
     "width": 6733,
     "height": 2848,
@@ -54,12 +54,12 @@
     "alt": "Rocky viewpoint overlooking forested hills at Horsley Hills"
   },
   "visakhapatnam": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Rushikonda_beach_view_001.jpg/1280px-Rushikonda_beach_view_001.jpg",
+    "src": "/photos/visakhapatnam-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Rushikonda_beach_view_001.jpg/500px-Rushikonda_beach_view_001.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Rushikonda_beach_view_001.jpg/960px-Rushikonda_beach_view_001.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Rushikonda_beach_view_001.jpg/1280px-Rushikonda_beach_view_001.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Rushikonda_beach_view_001.jpg/1920px-Rushikonda_beach_view_001.jpg"
+      "500": "/photos/visakhapatnam-500.jpg",
+      "960": "/photos/visakhapatnam-960.jpg",
+      "1280": "/photos/visakhapatnam-1280.jpg",
+      "1920": "/photos/visakhapatnam-1920.jpg"
     },
     "width": 2560,
     "height": 1920,
@@ -72,12 +72,12 @@
     "alt": "Rushikonda beach on the Visakhapatnam coast"
   },
   "ananthagiri-hills": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Ananthagiri_Hills.JPG/1280px-Ananthagiri_Hills.JPG",
+    "src": "/photos/ananthagiri-hills-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Ananthagiri_Hills.JPG/500px-Ananthagiri_Hills.JPG",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Ananthagiri_Hills.JPG/960px-Ananthagiri_Hills.JPG",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Ananthagiri_Hills.JPG/1280px-Ananthagiri_Hills.JPG",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/Ananthagiri_Hills.JPG/1920px-Ananthagiri_Hills.JPG"
+      "500": "/photos/ananthagiri-hills-500.jpg",
+      "960": "/photos/ananthagiri-hills-960.jpg",
+      "1280": "/photos/ananthagiri-hills-1280.jpg",
+      "1920": "/photos/ananthagiri-hills-1920.jpg"
     },
     "width": 4928,
     "height": 3264,
@@ -90,12 +90,12 @@
     "alt": "Forested slopes of the Ananthagiri Hills"
   },
   "laknavaram": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Laknavaram_Hanging_Bridge_05.jpg/1280px-Laknavaram_Hanging_Bridge_05.jpg",
+    "src": "/photos/laknavaram-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Laknavaram_Hanging_Bridge_05.jpg/500px-Laknavaram_Hanging_Bridge_05.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Laknavaram_Hanging_Bridge_05.jpg/960px-Laknavaram_Hanging_Bridge_05.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Laknavaram_Hanging_Bridge_05.jpg/1280px-Laknavaram_Hanging_Bridge_05.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Laknavaram_Hanging_Bridge_05.jpg/1920px-Laknavaram_Hanging_Bridge_05.jpg"
+      "500": "/photos/laknavaram-500.jpg",
+      "960": "/photos/laknavaram-960.jpg",
+      "1280": "/photos/laknavaram-1280.jpg",
+      "1920": "/photos/laknavaram-1920.jpg"
     },
     "width": 4000,
     "height": 3000,
@@ -108,12 +108,12 @@
     "alt": "Suspension bridge over Laknavaram Lake"
   },
   "nagarjuna-sagar": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/NagarjunaSagarDam.JPG/1280px-NagarjunaSagarDam.JPG",
+    "src": "/photos/nagarjuna-sagar-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/NagarjunaSagarDam.JPG/500px-NagarjunaSagarDam.JPG",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/NagarjunaSagarDam.JPG/960px-NagarjunaSagarDam.JPG",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/NagarjunaSagarDam.JPG/1280px-NagarjunaSagarDam.JPG",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/NagarjunaSagarDam.JPG/1920px-NagarjunaSagarDam.JPG"
+      "500": "/photos/nagarjuna-sagar-500.jpg",
+      "960": "/photos/nagarjuna-sagar-960.jpg",
+      "1280": "/photos/nagarjuna-sagar-1280.jpg",
+      "1920": "/photos/nagarjuna-sagar-1920.jpg"
     },
     "width": 2240,
     "height": 1680,
@@ -126,12 +126,12 @@
     "alt": "Nagarjuna Sagar Dam on the Krishna river"
   },
   "coorg": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Tadiandamol_Valley%2C_Western_Ghats.jpg/1280px-Tadiandamol_Valley%2C_Western_Ghats.jpg",
+    "src": "/photos/coorg-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Tadiandamol_Valley%2C_Western_Ghats.jpg/500px-Tadiandamol_Valley%2C_Western_Ghats.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Tadiandamol_Valley%2C_Western_Ghats.jpg/960px-Tadiandamol_Valley%2C_Western_Ghats.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Tadiandamol_Valley%2C_Western_Ghats.jpg/1280px-Tadiandamol_Valley%2C_Western_Ghats.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Tadiandamol_Valley%2C_Western_Ghats.jpg/1920px-Tadiandamol_Valley%2C_Western_Ghats.jpg"
+      "500": "/photos/coorg-500.jpg",
+      "960": "/photos/coorg-960.jpg",
+      "1280": "/photos/coorg-1280.jpg",
+      "1920": "/photos/coorg-1920.jpg"
     },
     "width": 6000,
     "height": 4000,
@@ -144,12 +144,12 @@
     "alt": "Valley below Tadiandamol in the Western Ghats, Kodagu"
   },
   "chikmagalur": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg/1280px-Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg",
+    "src": "/photos/chikmagalur-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg/500px-Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg/960px-Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg/1280px-Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg/1920px-Landscapes_of_Western_Ghats_from_Mullayyanagiri_Betta.jpg"
+      "500": "/photos/chikmagalur-500.jpg",
+      "960": "/photos/chikmagalur-960.jpg",
+      "1280": "/photos/chikmagalur-1280.jpg",
+      "1920": "/photos/chikmagalur-1920.jpg"
     },
     "width": 6000,
     "height": 4000,
@@ -162,12 +162,12 @@
     "alt": "Western Ghats ridges seen from Mullayanagiri, Chikmagalur"
   },
   "sakleshpur": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg/1280px-Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg",
+    "src": "/photos/sakleshpur-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg/500px-Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg/960px-Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg/1280px-Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg/1920px-Places_in_western_ghat_karntataka_between_subramanya_and_sakleshpur_14.jpg"
+      "500": "/photos/sakleshpur-500.jpg",
+      "960": "/photos/sakleshpur-960.jpg",
+      "1280": "/photos/sakleshpur-1280.jpg",
+      "1920": "/photos/sakleshpur-1920.jpg"
     },
     "width": 3264,
     "height": 2448,
@@ -180,10 +180,10 @@
     "alt": "Western Ghats scenery near Sakleshpur"
   },
   "gokarna": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Kudle_Beach%2C_Gokarna.jpg/960px-Kudle_Beach%2C_Gokarna.jpg",
+    "src": "/photos/gokarna-960.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Kudle_Beach%2C_Gokarna.jpg/500px-Kudle_Beach%2C_Gokarna.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Kudle_Beach%2C_Gokarna.jpg/960px-Kudle_Beach%2C_Gokarna.jpg"
+      "500": "/photos/gokarna-500.jpg",
+      "960": "/photos/gokarna-960.jpg"
     },
     "width": 1152,
     "height": 864,
@@ -196,11 +196,11 @@
     "alt": "Kudle Beach in Gokarna"
   },
   "kabini": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Kabani_River.jpg/1280px-Kabani_River.jpg",
+    "src": "/photos/kabini-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Kabani_River.jpg/500px-Kabani_River.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Kabani_River.jpg/960px-Kabani_River.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6a/Kabani_River.jpg/1280px-Kabani_River.jpg"
+      "500": "/photos/kabini-500.jpg",
+      "960": "/photos/kabini-960.jpg",
+      "1280": "/photos/kabini-1280.jpg"
     },
     "width": 1800,
     "height": 1200,
@@ -213,12 +213,12 @@
     "alt": "The Kabini river flowing through forest"
   },
   "hampi": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg/1280px-Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg",
+    "src": "/photos/hampi-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg/500px-Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg/960px-Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg/1280px-Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg/1920px-Wide_angle_of_Galigopuram_of_Virupaksha_Temple%2C_Hampi_%2804%29_%28cropped%29.jpg"
+      "500": "/photos/hampi-500.jpg",
+      "960": "/photos/hampi-960.jpg",
+      "1280": "/photos/hampi-1280.jpg",
+      "1920": "/photos/hampi-1920.jpg"
     },
     "width": 6000,
     "height": 3000,
@@ -231,12 +231,12 @@
     "alt": "Gopuram of the Virupaksha Temple in Hampi"
   },
   "munnar": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Munnar_-_Tea_Plantations.jpg/1280px-Munnar_-_Tea_Plantations.jpg",
+    "src": "/photos/munnar-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Munnar_-_Tea_Plantations.jpg/500px-Munnar_-_Tea_Plantations.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Munnar_-_Tea_Plantations.jpg/960px-Munnar_-_Tea_Plantations.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Munnar_-_Tea_Plantations.jpg/1280px-Munnar_-_Tea_Plantations.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Munnar_-_Tea_Plantations.jpg/1920px-Munnar_-_Tea_Plantations.jpg"
+      "500": "/photos/munnar-500.jpg",
+      "960": "/photos/munnar-960.jpg",
+      "1280": "/photos/munnar-1280.jpg",
+      "1920": "/photos/munnar-1920.jpg"
     },
     "width": 6976,
     "height": 2596,
@@ -249,12 +249,12 @@
     "alt": "Tea plantations on the hillsides of Munnar"
   },
   "wayanad": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Blue%2C_Green_%26_White.jpg/1280px-Blue%2C_Green_%26_White.jpg",
+    "src": "/photos/wayanad-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Blue%2C_Green_%26_White.jpg/500px-Blue%2C_Green_%26_White.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Blue%2C_Green_%26_White.jpg/960px-Blue%2C_Green_%26_White.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Blue%2C_Green_%26_White.jpg/1280px-Blue%2C_Green_%26_White.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Blue%2C_Green_%26_White.jpg/1920px-Blue%2C_Green_%26_White.jpg"
+      "500": "/photos/wayanad-500.jpg",
+      "960": "/photos/wayanad-960.jpg",
+      "1280": "/photos/wayanad-1280.jpg",
+      "1920": "/photos/wayanad-1920.jpg"
     },
     "width": 6000,
     "height": 4000,
@@ -267,12 +267,12 @@
     "alt": "Green grassland and hills in Wayanad"
   },
   "alleppey": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Alappuzha_Boat_Beauty_W.jpg/1280px-Alappuzha_Boat_Beauty_W.jpg",
+    "src": "/photos/alleppey-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Alappuzha_Boat_Beauty_W.jpg/500px-Alappuzha_Boat_Beauty_W.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Alappuzha_Boat_Beauty_W.jpg/960px-Alappuzha_Boat_Beauty_W.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Alappuzha_Boat_Beauty_W.jpg/1280px-Alappuzha_Boat_Beauty_W.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Alappuzha_Boat_Beauty_W.jpg/1920px-Alappuzha_Boat_Beauty_W.jpg"
+      "500": "/photos/alleppey-500.jpg",
+      "960": "/photos/alleppey-960.jpg",
+      "1280": "/photos/alleppey-1280.jpg",
+      "1920": "/photos/alleppey-1920.jpg"
     },
     "width": 2500,
     "height": 1656,
@@ -285,12 +285,12 @@
     "alt": "Boat on the backwaters of Alappuzha"
   },
   "thekkady": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Thekkady.jpg/1280px-Thekkady.jpg",
+    "src": "/photos/thekkady-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Thekkady.jpg/500px-Thekkady.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Thekkady.jpg/960px-Thekkady.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Thekkady.jpg/1280px-Thekkady.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Thekkady.jpg/1920px-Thekkady.jpg"
+      "500": "/photos/thekkady-500.jpg",
+      "960": "/photos/thekkady-960.jpg",
+      "1280": "/photos/thekkady-1280.jpg",
+      "1920": "/photos/thekkady-1920.jpg"
     },
     "width": 4495,
     "height": 3371,
@@ -303,12 +303,12 @@
     "alt": "Landscape at Thekkady"
   },
   "varkala": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Varkala_beach_from_above.jpg/1280px-Varkala_beach_from_above.jpg",
+    "src": "/photos/varkala-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Varkala_beach_from_above.jpg/500px-Varkala_beach_from_above.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Varkala_beach_from_above.jpg/960px-Varkala_beach_from_above.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Varkala_beach_from_above.jpg/1280px-Varkala_beach_from_above.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Varkala_beach_from_above.jpg/1920px-Varkala_beach_from_above.jpg"
+      "500": "/photos/varkala-500.jpg",
+      "960": "/photos/varkala-960.jpg",
+      "1280": "/photos/varkala-1280.jpg",
+      "1920": "/photos/varkala-1920.jpg"
     },
     "width": 4534,
     "height": 3023,
@@ -321,12 +321,12 @@
     "alt": "Varkala beach seen from the cliffs"
   },
   "kumarakom": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Kumarkom.jpg/1280px-Kumarkom.jpg",
+    "src": "/photos/kumarakom-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Kumarkom.jpg/500px-Kumarkom.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Kumarkom.jpg/960px-Kumarkom.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Kumarkom.jpg/1280px-Kumarkom.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Kumarkom.jpg/1920px-Kumarkom.jpg"
+      "500": "/photos/kumarakom-500.jpg",
+      "960": "/photos/kumarakom-960.jpg",
+      "1280": "/photos/kumarakom-1280.jpg",
+      "1920": "/photos/kumarakom-1920.jpg"
     },
     "width": 4608,
     "height": 3456,
@@ -339,12 +339,12 @@
     "alt": "Backwaters at Kumarakom"
   },
   "ooty": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Ooty_lake.jpg/1280px-Ooty_lake.jpg",
+    "src": "/photos/ooty-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Ooty_lake.jpg/500px-Ooty_lake.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Ooty_lake.jpg/960px-Ooty_lake.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Ooty_lake.jpg/1280px-Ooty_lake.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Ooty_lake.jpg/1920px-Ooty_lake.jpg"
+      "500": "/photos/ooty-500.jpg",
+      "960": "/photos/ooty-960.jpg",
+      "1280": "/photos/ooty-1280.jpg",
+      "1920": "/photos/ooty-1920.jpg"
     },
     "width": 2442,
     "height": 1329,
@@ -357,12 +357,12 @@
     "alt": "Ooty Lake in the Nilgiris"
   },
   "kodaikanal": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Boating_in_Kodaikanal_Lake_with_Mist.jpg/1280px-Boating_in_Kodaikanal_Lake_with_Mist.jpg",
+    "src": "/photos/kodaikanal-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Boating_in_Kodaikanal_Lake_with_Mist.jpg/500px-Boating_in_Kodaikanal_Lake_with_Mist.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Boating_in_Kodaikanal_Lake_with_Mist.jpg/960px-Boating_in_Kodaikanal_Lake_with_Mist.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Boating_in_Kodaikanal_Lake_with_Mist.jpg/1280px-Boating_in_Kodaikanal_Lake_with_Mist.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Boating_in_Kodaikanal_Lake_with_Mist.jpg/1920px-Boating_in_Kodaikanal_Lake_with_Mist.jpg"
+      "500": "/photos/kodaikanal-500.jpg",
+      "960": "/photos/kodaikanal-960.jpg",
+      "1280": "/photos/kodaikanal-1280.jpg",
+      "1920": "/photos/kodaikanal-1920.jpg"
     },
     "width": 5184,
     "height": 3456,
@@ -375,12 +375,12 @@
     "alt": "Mist over Kodaikanal Lake with boats"
   },
   "yercaud": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Yercaud_lake.jpg/1280px-Yercaud_lake.jpg",
+    "src": "/photos/yercaud-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Yercaud_lake.jpg/500px-Yercaud_lake.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Yercaud_lake.jpg/960px-Yercaud_lake.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Yercaud_lake.jpg/1280px-Yercaud_lake.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Yercaud_lake.jpg/1920px-Yercaud_lake.jpg"
+      "500": "/photos/yercaud-500.jpg",
+      "960": "/photos/yercaud-960.jpg",
+      "1280": "/photos/yercaud-1280.jpg",
+      "1920": "/photos/yercaud-1920.jpg"
     },
     "width": 3241,
     "height": 1658,
@@ -393,12 +393,12 @@
     "alt": "Yercaud Lake in the Shevaroy Hills"
   },
   "coonoor": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg/1280px-Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg",
+    "src": "/photos/coonoor-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg/500px-Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg/960px-Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg/1280px-Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg/1920px-Tea_estates_at_Hubbathalai_near_Coonoor%2C_Nilgiris.jpg"
+      "500": "/photos/coonoor-500.jpg",
+      "960": "/photos/coonoor-960.jpg",
+      "1280": "/photos/coonoor-1280.jpg",
+      "1920": "/photos/coonoor-1920.jpg"
     },
     "width": 4032,
     "height": 3024,
@@ -411,12 +411,12 @@
     "alt": "Tea estates near Coonoor in the Nilgiris"
   },
   "valparai": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Tea_Estates_in_Valparai.jpg/1280px-Tea_Estates_in_Valparai.jpg",
+    "src": "/photos/valparai-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Tea_Estates_in_Valparai.jpg/500px-Tea_Estates_in_Valparai.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Tea_Estates_in_Valparai.jpg/960px-Tea_Estates_in_Valparai.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Tea_Estates_in_Valparai.jpg/1280px-Tea_Estates_in_Valparai.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Tea_Estates_in_Valparai.jpg/1920px-Tea_Estates_in_Valparai.jpg"
+      "500": "/photos/valparai-500.jpg",
+      "960": "/photos/valparai-960.jpg",
+      "1280": "/photos/valparai-1280.jpg",
+      "1920": "/photos/valparai-1920.jpg"
     },
     "width": 4096,
     "height": 3072,
@@ -429,12 +429,12 @@
     "alt": "Tea estates in Valparai"
   },
   "mahabalipuram": {
-    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg/1280px-Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg",
+    "src": "/photos/mahabalipuram-1280.jpg",
     "srcSet": {
-      "500": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg/500px-Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg",
-      "960": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg/960px-Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg",
-      "1280": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg/1280px-Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg",
-      "1920": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg/1920px-Shore_Temple_-Mamallapuram_-Tamil_Nadu_-N-TN-C55.jpg"
+      "500": "/photos/mahabalipuram-500.jpg",
+      "960": "/photos/mahabalipuram-960.jpg",
+      "1280": "/photos/mahabalipuram-1280.jpg",
+      "1920": "/photos/mahabalipuram-1920.jpg"
     },
     "width": 4974,
     "height": 3316,
