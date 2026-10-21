@@ -3,3 +3,5 @@
 pytest==9.1.1
 pytest-asyncio==1.4.0       # lets pytest run `async def` tests
 ruff==0.17.1                # linter + formatter
+pytest-cov==7.1.0          # coverage reports: pytest --cov=app
+pip-audit==2.10.1           # checks dependencies for known vulnerabilities

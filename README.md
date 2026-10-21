@@ -16,3 +16,4 @@ React + Vite frontend, with separate customer, resort-owner, and admin experienc
 6. [Booking, pricing & availability engine](docs/06-booking-engine.md)
 7. [Roadmap & phase exit criteria](docs/07-roadmap.md)
 8. [Local setup (macOS)](docs/08-local-setup.md)
+9. [Testing & security](docs/09-testing-and-security.md)

@@ -16,6 +16,8 @@ export default function Drawer({ open, onClose, title, children, footer }) {
   }, [open])
 
   return (
+    // Backdrop click closes; keyboard users get Esc (native <dialog>) and the Close button.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <dialog
       ref={ref}
       onClose={onClose}

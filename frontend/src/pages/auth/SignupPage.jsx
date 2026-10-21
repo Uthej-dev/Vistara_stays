@@ -24,7 +24,7 @@ export default function SignupPage({ accountType = 'customer' }) {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(signupSchema) })
 
-  const onSubmit = async ({ accept, phone, business_name, ...values }) => {
+  const onSubmit = async ({ accept: _accept, phone, business_name, ...values }) => {
     setServerError(null)
     try {
       const user = await signup({

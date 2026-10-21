@@ -30,6 +30,7 @@ from app.api.routes import (
 )
 from app.core.config import Settings, get_settings
 from app.core.errors import register_exception_handlers
+from app.core.hardening import BodySizeLimitMiddleware, SecurityHeadersMiddleware
 from app.core.logging import RequestContextMiddleware, configure_logging
 from app.core.rate_limit import RateLimiter
 from app.db.indexes import ensure_indexes
@@ -101,6 +102,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     # Middleware runs outermost-last-added: CORS wraps everything, then request logging.
     app.add_middleware(RequestContextMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware, hsts=settings.is_production)
+    # Uploads are capped at MAX_UPLOAD_MB; allow a little extra for multipart overhead.
+    app.add_middleware(
+        BodySizeLimitMiddleware, max_bytes=(settings.max_upload_mb + 1) * 1024 * 1024
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

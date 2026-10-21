@@ -62,12 +62,11 @@ function CheckGroup({ options, value, onChange, legend }) {
 
 /**
  * Local form state for one editor section. It's initialised once per listing — NOT on every
- * refetch — so saving one section never wipes unsaved edits in another.
+ * refetch — so saving one section never wipes unsaved edits in another. (The Editor is keyed by
+ * listing id, so opening a different listing starts fresh.)
  */
 function useSection(resort, pick) {
-  const [form, setForm] = useState(() => pick(resort))
-  useEffect(() => setForm(pick(resort)), [resort.id]) // eslint-disable-line react-hooks/exhaustive-deps
-  return [form, setForm]
+  return useState(() => pick(resort))
 }
 
 export default function ResortEditorPage() {
@@ -87,7 +86,7 @@ export default function ResortEditorPage() {
   const refresh = () => {
     queryClient.invalidateQueries({ queryKey: ['owner'] })
   }
-  return <Editor resort={resortQuery.data} rooms={roomsQuery.data ?? []} refresh={refresh} toast={toast} />
+  return <Editor key={resortQuery.data.id} resort={resortQuery.data} rooms={roomsQuery.data ?? []} refresh={refresh} toast={toast} />
 }
 
 function Editor({ resort, rooms, refresh, toast }) {

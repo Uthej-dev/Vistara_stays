@@ -20,6 +20,7 @@ export default function PaymentPage() {
   const toast = useToast()
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
+  const [expired, setExpired] = useState(false)
   const booking = useQuery({ queryKey: ['bookings', bookingId], queryFn: () => getBooking(bookingId) })
   const config = useQuery({ queryKey: ['payment-config'], queryFn: getPaymentConfig, staleTime: Infinity })
 
@@ -63,7 +64,6 @@ export default function PaymentPage() {
     )
   }
   const b = booking.data
-  const expired = new Date(b.hold_expires_at).getTime() <= Date.now()
 
   return (
     <Container className="max-w-4xl py-10">
@@ -72,7 +72,13 @@ export default function PaymentPage() {
 
       <div className="mt-8 grid gap-8 md:grid-cols-[1fr_340px]">
         <section className="space-y-5 rounded-3xl bg-white p-6 ring-1 ring-forest-900/5">
-          <HoldCountdown expiresAt={b.hold_expires_at} onExpire={() => booking.refetch()} />
+          <HoldCountdown
+            expiresAt={b.hold_expires_at}
+            onExpire={() => {
+              setExpired(true)
+              booking.refetch()
+            }}
+          />
           <FormAlert>{error}</FormAlert>
 
           {config.data?.provider === 'razorpay' ? (

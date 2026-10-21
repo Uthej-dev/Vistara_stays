@@ -38,9 +38,12 @@ class EmailService:
             else:
                 self.outbox.append(email)
                 del self.outbox[:-50]  # keep the last 50 only
+                # Email bodies can contain one-time links (password reset). They are logged only
+                # in development; in production the console backend logs just the subject.
+                body = email.text if not self.settings.is_production else "[hidden in production]"
                 logger.info(
                     "Email (console backend)",
-                    extra={"to": email.to, "subject": email.subject, "body": email.text},
+                    extra={"to": email.to, "subject": email.subject, "body": body},
                 )
         except Exception:
             logger.exception("Email sending failed", extra={"subject": email.subject})

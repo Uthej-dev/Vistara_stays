@@ -229,6 +229,8 @@ export default function ResortPage() {
         </div>
       </div>
       {panelOpen && (
+        // Backdrop click closes; Esc and the Close button are the keyboard equivalents.
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
         <div role="dialog" aria-modal="true" aria-label="Book this stay" className="fixed inset-0 z-40 overflow-y-auto bg-forest-950/50 p-3 lg:hidden" onClick={(e) => e.target === e.currentTarget && setPanelOpen(false)}>
           <div className="mx-auto mt-10 max-w-md">
             <button type="button" onClick={() => setPanelOpen(false)} className="mb-2 ml-auto block rounded-full bg-white px-4 py-2 text-sm font-medium">

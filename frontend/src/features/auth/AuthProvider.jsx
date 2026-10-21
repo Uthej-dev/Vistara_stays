@@ -12,7 +12,8 @@ const AuthContext = createContext(null)
  */
 export function AuthProvider({ children }) {
   const queryClient = useQueryClient()
-  const [state, setState] = useState({ status: 'loading', user: null })
+  // No session hint → we already know the visitor is anonymous (no refresh call, no flash).
+  const [state, setState] = useState(() => (hasSessionHint() ? { status: 'loading', user: null } : { status: 'anonymous', user: null }))
 
   const signIn = useCallback((data) => {
     setAccessToken(data.access_token)
@@ -35,9 +36,6 @@ export function AuthProvider({ children }) {
       refreshSession()
         .then((data) => !cancelled && signIn(data))
         .catch(() => !cancelled && setState({ status: 'anonymous', user: null }))
-    } else {
-      // No session hint cookie: skip the refresh call entirely for anonymous visitors.
-      setState({ status: 'anonymous', user: null })
     }
     const unsubscribe = onSessionChange((event) => {
       if (event.type === 'refreshed') setState({ status: 'authenticated', user: event.data.user })

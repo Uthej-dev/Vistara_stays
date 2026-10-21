@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
+import { useCloseOnNavigate } from '../../hooks/useCloseOnNavigate'
 import { ChevronDown, LogOut } from 'lucide-react'
 import { cn } from '../../utils/cn'
 
@@ -37,9 +38,8 @@ export default function UserMenu({ user, onLogout, transparent }) {
   const [open, setOpen] = useState(false)
   const menuId = useId()
   const rootRef = useRef(null)
-  const location = useLocation()
 
-  useEffect(() => setOpen(false), [location.pathname])
+  useCloseOnNavigate(() => setOpen(false))
   useEffect(() => {
     if (!open) return undefined
     const close = (e) => !rootRef.current?.contains(e.target) && setOpen(false)

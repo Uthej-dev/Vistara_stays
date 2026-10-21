@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { NavLink, useLocation } from 'react-router'
+import { NavLink } from 'react-router'
 import { Building2, Heart, Menu, User, X } from 'lucide-react'
 import Logo from './Logo'
+import { useCloseOnNavigate } from '../../hooks/useCloseOnNavigate'
 import UserMenu, { menuLinksFor } from './UserMenu'
 import NotificationBell from './NotificationBell'
 import { useAuth } from '../../features/auth/AuthProvider'
@@ -21,7 +22,6 @@ export default function Navbar({ overlay = false }) {
   const { user, status, logout } = useAuth()
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const location = useLocation()
 
   useEffect(() => {
     if (!overlay) return undefined
@@ -32,7 +32,7 @@ export default function Navbar({ overlay = false }) {
   }, [overlay])
 
   // Close the mobile menu after navigating, and on Escape.
-  useEffect(() => setMenuOpen(false), [location.pathname])
+  useCloseOnNavigate(() => setMenuOpen(false))
   useEffect(() => {
     if (!menuOpen) return undefined
     const onKeyDown = (e) => e.key === 'Escape' && setMenuOpen(false)

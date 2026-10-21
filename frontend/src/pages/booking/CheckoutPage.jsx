@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
@@ -59,7 +59,7 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState(null)
   const [serverError, setServerError] = useState(null)
   // One key per checkout attempt: double-clicks and retries reuse it, so only one booking exists.
-  const idempotencyKey = useRef(crypto.randomUUID())
+  const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID())
 
   const quote = useQuery({
     queryKey: ['quote', stay, appliedCoupon],
@@ -83,15 +83,17 @@ export default function CheckoutPage() {
     document.title = 'Checkout · Vistara Stays'
   }, [])
 
-  // A coupon the server rejected: drop it and show why.
-  useEffect(() => {
-    if (appliedCoupon && quote.error) {
-      toast.error(toApiError(quote.error).message)
-      setAppliedCoupon(null)
+  // Validate a coupon with the server before using it; show the reason if it's rejected.
+  const applyCoupon = async (code) => {
+    try {
+      await getQuote({ ...stay, coupon_code: code })
+      setAppliedCoupon(code)
+    } catch (error) {
+      toast.error(toApiError(error).message)
     }
-  }, [appliedCoupon, quote.error, toast])
+  }
 
-  const onSubmit = async ({ accept, special_requests, arrival_time, ...guest }) => {
+  const onSubmit = async ({ accept: _accept, special_requests, arrival_time, ...guest }) => {
     setServerError(null)
     try {
       const booking = await createBooking(
@@ -101,14 +103,14 @@ export default function CheckoutPage() {
           guest_details: { ...guest, ...(arrival_time ? { arrival_time } : {}) },
           special_requests: special_requests || null,
         },
-        idempotencyKey.current,
+        idempotencyKey,
       )
       navigate(`/checkout/${booking.id}`, { replace: true })
     } catch (error) {
       const byField = fieldErrors(error)
       Object.entries(byField).forEach(([name, message]) => setError(name, { message }))
       if (!Object.keys(byField).length) setServerError(toApiError(error).message)
-      if (error?.response?.status === 409) idempotencyKey.current = crypto.randomUUID()
+      if (error?.response?.status === 409) setIdempotencyKey(crypto.randomUUID())
     }
   }
 
@@ -216,13 +218,13 @@ export default function CheckoutPage() {
               <Skeleton className="h-24" />
             )}
             <div className="mt-6 border-t border-forest-900/10 pt-5">
-              {quote.isPending ? <Skeleton className="h-40" /> : quote.error && !appliedCoupon ? <FormAlert>{toApiError(quote.error).message}</FormAlert> : <PriceBreakdown price={price} />}
+              {quote.isPending ? <Skeleton className="h-40" /> : quote.error ? <FormAlert>{toApiError(quote.error).message}</FormAlert> : <PriceBreakdown price={price} />}
             </div>
             <form
               className="mt-5 flex gap-2"
               onSubmit={(e) => {
                 e.preventDefault()
-                if (coupon.trim()) setAppliedCoupon(coupon.trim().toUpperCase())
+                if (coupon.trim()) applyCoupon(coupon.trim().toUpperCase())
               }}
             >
               <label htmlFor="coupon" className="sr-only">

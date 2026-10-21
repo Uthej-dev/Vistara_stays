@@ -322,17 +322,21 @@ export function AdminCouponsPage() {
 
 export function AdminSettingsPage() {
   useTitle('Settings')
+  const { data, isPending, error, refetch } = useQuery({ queryKey: ['admin', 'settings'], queryFn: adminApi.settings })
+  if (error) return <ErrorState error={error} onRetry={refetch} />
+  if (isPending) return <Skeleton className="h-96" />
+  return <SettingsForm key={JSON.stringify(data)} data={data} />
+}
+
+function SettingsForm({ data }) {
   const queryClient = useQueryClient()
   const toast = useToast()
-  const { data, isPending, error, refetch } = useQuery({ queryKey: ['admin', 'settings'], queryFn: adminApi.settings })
-  const [form, setForm] = useState(null)
+  const [form, setForm] = useState(() => ({
+    ...data,
+    tax_slabs: data.tax_slabs.map((s) => ({ upTo: s.up_to_paise_per_night == null ? '' : String(s.up_to_paise_per_night / 100), rate: String(s.rate_pct) })),
+  }))
   const [serverError, setServerError] = useState(null)
   const [busy, setBusy] = useState(false)
-  useEffect(() => {
-    if (data) setForm({ ...data, tax_slabs: data.tax_slabs.map((s) => ({ upTo: s.up_to_paise_per_night == null ? '' : String(s.up_to_paise_per_night / 100), rate: String(s.rate_pct) })) })
-  }, [data])
-  if (error) return <ErrorState error={error} onRetry={refetch} />
-  if (isPending || !form) return <Skeleton className="h-96" />
 
   const save = async (e) => {
     e.preventDefault()

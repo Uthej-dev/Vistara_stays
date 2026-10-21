@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useId, useState } from 'react'
 import { Star } from 'lucide-react'
 import { PROPERTY_TYPE_LABELS, STATE_NAMES, STATE_ORDER } from '../../utils/labels'
 
@@ -40,7 +40,6 @@ function PriceRange({ min, max, basis, hasDates, onApply }) {
   const [values, setValues] = useState({ min: min ?? '', max: max ?? '' })
   const idMin = useId()
   const idMax = useId()
-  useEffect(() => setValues({ min: min ?? '', max: max ?? '' }), [min, max])
 
   return (
     <form
@@ -128,6 +127,7 @@ export default function FilterPanel({ params, categories, facets = {}, actions }
 
       <Group title={hasDates && params.get('price_basis') === 'total' ? 'Total price for your stay' : 'Price per night'}>
         <PriceRange
+          key={`${params.get('min_price')}-${params.get('max_price')}`}
           min={params.get('min_price')}
           max={params.get('max_price')}
           basis={params.get('price_basis')}

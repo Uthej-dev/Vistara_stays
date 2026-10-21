@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Bell } from 'lucide-react'
 import { apiClient } from '../../api/client'
 import { formatDateTime } from '../../utils/format'
+import { useCloseOnNavigate } from '../../hooks/useCloseOnNavigate'
 import { cn } from '../../utils/cn'
 
 const fetchNotifications = () => apiClient.get('/notifications', { params: { limit: 10 } }).then((r) => r.data)
@@ -13,12 +14,11 @@ export default function NotificationBell({ transparent }) {
   const [open, setOpen] = useState(false)
   const panelId = useId()
   const rootRef = useRef(null)
-  const location = useLocation()
   const queryClient = useQueryClient()
   const { data } = useQuery({ queryKey: ['me', 'notifications'], queryFn: fetchNotifications, refetchInterval: 60_000 })
   const unread = data?.unread ?? 0
 
-  useEffect(() => setOpen(false), [location.pathname])
+  useCloseOnNavigate(() => setOpen(false))
   useEffect(() => {
     if (!open) return undefined
     const close = (e) => !rootRef.current?.contains(e.target) && setOpen(false)

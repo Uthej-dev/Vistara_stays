@@ -1,0 +1,12 @@
+{
+  "name": "vistara-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Browser journeys against the running dev servers (uses your installed Chrome).",
+  "scripts": {
+    "test": "node run.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "24.10.0"
+  }
+}
