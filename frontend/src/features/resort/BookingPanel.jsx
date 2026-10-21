@@ -57,7 +57,7 @@ export default function BookingPanel({ resort, stayState, availability }) {
   const canBook = datesValid && selected?.bookable
 
   const reserve = () => {
-    const target = `/checkout?${stayQuery({ ...stay, roomTypeId: selected.room_type_id })}`
+    const target = `/checkout?${stayQuery({ ...stay, roomTypeId: selected.room_type_id })}&resort=${resort.slug}`
     if (status !== 'authenticated') navigate(`/login?next=${encodeURIComponent(target)}`)
     else navigate(target)
   }

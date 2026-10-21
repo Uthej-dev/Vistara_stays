@@ -17,8 +17,14 @@ def day(offset: int) -> str:
 
 def stay(room, start=30, nights=2, **overrides):
     return {
-        "room_type_id": str(room["_id"]), "check_in": day(start), "check_out": day(start + nights),
-        "rooms": 1, "adults": 2, "children": 0, "child_ages": [], **overrides,
+        "room_type_id": str(room["_id"]),
+        "check_in": day(start),
+        "check_out": day(start + nights),
+        "rooms": 1,
+        "adults": 2,
+        "children": 0,
+        "child_ages": [],
+        **overrides,
     }
 
 
@@ -36,7 +42,9 @@ async def test_quote_prices_the_stay_on_the_server(client, db):
     assert body["price"]["nights_count"] == 3
     assert len(body["price"]["nights"]) == 3  # check-out night not charged
     assert body["price"]["total_paise"] == (
-        body["price"]["taxable_paise"] + body["price"]["tax_total_paise"] + body["price"]["service_fee_paise"]
+        body["price"]["taxable_paise"]
+        + body["price"]["tax_total_paise"]
+        + body["price"]["service_fee_paise"]
     )
 
 
@@ -76,7 +84,9 @@ async def test_child_ages_must_match_children(client, db):
 async def test_unpublished_resort_or_inactive_room_cannot_be_quoted(client, db):
     draft = await make_listing(db, status="draft")
     live = await make_listing(db)
-    await db["room_types"].update_one({"_id": live["room"]["_id"]}, {"$set": {"status": "inactive"}})
+    await db["room_types"].update_one(
+        {"_id": live["room"]["_id"]}, {"$set": {"status": "inactive"}}
+    )
 
     assert (await quote(client, stay(draft["room"])))[0] == 404
     assert (await quote(client, stay(live["room"])))[0] == 404
@@ -85,16 +95,25 @@ async def test_unpublished_resort_or_inactive_room_cannot_be_quoted(client, db):
 async def test_sold_out_nights_make_the_room_unavailable(client, db):
     listing = await make_listing(db, units=2)
     room = listing["room"]
-    await db["inventory"].insert_one({
-        "room_type_id": room["_id"], "resort_id": room["resort_id"], "date": day(31),
-        "total_units": 2, "reserved_units": 1, "blocked_units": 1, "version": 0,
-    })
+    await db["inventory"].insert_one(
+        {
+            "room_type_id": room["_id"],
+            "resort_id": room["resort_id"],
+            "date": day(31),
+            "total_units": 2,
+            "reserved_units": 1,
+            "blocked_units": 1,
+            "version": 0,
+        }
+    )
 
     _, body = await quote(client, stay(room, start=30, nights=3))
-    availability = (await client.get(
-        f"{API}/resorts/{listing['resort']['_id']}/availability",
-        params={"check_in": day(30), "check_out": day(33)},
-    )).json()
+    availability = (
+        await client.get(
+            f"{API}/resorts/{listing['resort']['_id']}/availability",
+            params={"check_in": day(30), "check_out": day(33)},
+        )
+    ).json()
     _, other_dates = await quote(client, stay(room, start=40))
 
     assert body["available"] is False and body["available_units"] == 0
@@ -106,10 +125,18 @@ async def test_sold_out_nights_make_the_room_unavailable(client, db):
 async def test_closed_day_blocks_the_whole_stay(client, db):
     listing = await make_listing(db)
     room = listing["room"]
-    await db["inventory"].insert_one({
-        "room_type_id": room["_id"], "resort_id": room["resort_id"], "date": day(30),
-        "total_units": 3, "reserved_units": 0, "blocked_units": 0, "closed": True, "version": 0,
-    })
+    await db["inventory"].insert_one(
+        {
+            "room_type_id": room["_id"],
+            "resort_id": room["resort_id"],
+            "date": day(30),
+            "total_units": 3,
+            "reserved_units": 0,
+            "blocked_units": 0,
+            "closed": True,
+            "version": 0,
+        }
+    )
     _, body = await quote(client, stay(room))
     assert body["available"] is False
 
@@ -117,30 +144,67 @@ async def test_closed_day_blocks_the_whole_stay(client, db):
 async def test_date_override_and_seasonal_rule_are_used(client, db):
     listing = await make_listing(db)
     room = listing["room"]
-    await db["inventory"].insert_one({
-        "room_type_id": room["_id"], "resort_id": room["resort_id"], "date": day(30),
-        "total_units": 3, "reserved_units": 0, "blocked_units": 0, "price_override_paise": 1234500, "version": 0,
-    })
-    await db["rate_rules"].insert_one({
-        "room_type_id": room["_id"], "owner_id": room["owner_id"], "name": "Peak",
-        "start_date": day(31), "end_date": day(31), "adjustment": {"type": "fixed_rate", "value": 777700},
-        "priority": 1, "is_active": True,
-    })
+    await db["inventory"].insert_one(
+        {
+            "room_type_id": room["_id"],
+            "resort_id": room["resort_id"],
+            "date": day(30),
+            "total_units": 3,
+            "reserved_units": 0,
+            "blocked_units": 0,
+            "price_override_paise": 1234500,
+            "version": 0,
+        }
+    )
+    await db["rate_rules"].insert_one(
+        {
+            "room_type_id": room["_id"],
+            "owner_id": room["owner_id"],
+            "name": "Peak",
+            "start_date": day(31),
+            "end_date": day(31),
+            "adjustment": {"type": "fixed_rate", "value": 777700},
+            "priority": 1,
+            "is_active": True,
+        }
+    )
     _, body = await quote(client, stay(room))
 
     assert [(n["rate_paise"], n["source"]) for n in body["price"]["nights"]] == [
-        (1234500, "date_override"), (777700, "rule:Peak"),
+        (1234500, "date_override"),
+        (777700, "rule:Peak"),
     ]
 
 
 async def test_coupons_are_validated_on_the_server(client, db):
     listing = await make_listing(db)
     code = unique("SAVE").upper().replace("-", "")
-    await db["coupons"].insert_many([
-        {"code": code, "type": "percent", "value": 10, "max_discount_paise": 100000, "is_active": True, "used_count": 0},
-        {"code": code + "OLD", "type": "flat", "value": 50000, "is_active": True, "valid_to": day(-1)},
-        {"code": code + "MIN", "type": "flat", "value": 50000, "is_active": True, "min_subtotal_paise": 99999999},
-    ])
+    await db["coupons"].insert_many(
+        [
+            {
+                "code": code,
+                "type": "percent",
+                "value": 10,
+                "max_discount_paise": 100000,
+                "is_active": True,
+                "used_count": 0,
+            },
+            {
+                "code": code + "OLD",
+                "type": "flat",
+                "value": 50000,
+                "is_active": True,
+                "valid_to": day(-1),
+            },
+            {
+                "code": code + "MIN",
+                "type": "flat",
+                "value": 50000,
+                "is_active": True,
+                "min_subtotal_paise": 99999999,
+            },
+        ]
+    )
     room = listing["room"]
 
     ok_status, ok = await quote(client, stay(room, coupon_code=code.lower()))
@@ -148,7 +212,11 @@ async def test_coupons_are_validated_on_the_server(client, db):
     _, minimum = await quote(client, stay(room, coupon_code=code + "MIN"))
     _, unknown = await quote(client, stay(room, coupon_code="NOPE"))
 
-    assert ok_status == 200 and ok["price"]["discount_paise"] == 100000 and ok["price"]["coupon_code"] == code
+    assert (
+        ok_status == 200
+        and ok["price"]["discount_paise"] == 100000
+        and ok["price"]["coupon_code"] == code
+    )
     assert expired_status == 400 and expired["error"]["code"] == "COUPON_INVALID"
     assert "minimum" in minimum["error"]["message"]
     assert unknown["error"]["code"] == "COUPON_INVALID"
@@ -168,14 +236,23 @@ async def test_search_with_dates_shows_real_totals_and_hides_sold_out(client, db
     open_listing = await make_listing(db, name=f"Open {town}")
     full_listing = await make_listing(db, name=f"Full {town}", units=1)
     full_room = full_listing["room"]
-    await db["inventory"].insert_one({
-        "room_type_id": full_room["_id"], "resort_id": full_room["resort_id"], "date": day(30),
-        "total_units": 1, "reserved_units": 1, "blocked_units": 0, "version": 0,
-    })
+    await db["inventory"].insert_one(
+        {
+            "room_type_id": full_room["_id"],
+            "resort_id": full_room["resort_id"],
+            "date": day(30),
+            "total_units": 1,
+            "reserved_units": 1,
+            "blocked_units": 0,
+            "version": 0,
+        }
+    )
     params = {"q": town, "check_in": day(30), "check_out": day(32)}
 
     available_only = (await client.get(f"{API}/resorts/search", params=params)).json()
-    everything = (await client.get(f"{API}/resorts/search", params={**params, "available_only": "false"})).json()
+    everything = (
+        await client.get(f"{API}/resorts/search", params={**params, "available_only": "false"})
+    ).json()
     _, direct = await quote(client, stay(open_listing["room"]))
 
     assert [r["name"] for r in available_only["items"]] == [f"Open {town}"]
@@ -183,7 +260,10 @@ async def test_search_with_dates_shows_real_totals_and_hides_sold_out(client, db
     assert card["price"]["kind"] == "stay" and card["price"]["taxes_included"] is True
     assert card["price"]["total_paise"] == direct["price"]["total_paise"]
     assert available_only["nights"] == 2
-    assert {r["name"]: r["available"] for r in everything["items"]} == {f"Open {town}": True, f"Full {town}": False}
+    assert {r["name"]: r["available"] for r in everything["items"]} == {
+        f"Open {town}": True,
+        f"Full {town}": False,
+    }
 
 
 async def test_search_with_dates_filters_by_total_price(client, db):
@@ -199,7 +279,9 @@ async def test_search_with_dates_filters_by_total_price(client, db):
 
 
 async def test_search_rejects_past_dates(client, db):
-    response = await client.get(f"{API}/resorts/search", params={"check_in": day(-3), "check_out": day(-1)})
+    response = await client.get(
+        f"{API}/resorts/search", params={"check_in": day(-3), "check_out": day(-1)}
+    )
     assert response.status_code == 400
 
 
@@ -210,7 +292,11 @@ async def test_enquiry_reaches_the_owner(client, db):
     listing = await make_listing(db)
     response = await client.post(
         f"{API}/resorts/{listing['resort']['_id']}/enquiries",
-        json={"name": "Meera", "email": "meera@example.com", "message": "Is the road accessible by car in July?"},
+        json={
+            "name": "Meera",
+            "email": "meera@example.com",
+            "message": "Is the road accessible by car in July?",
+        },
     )
     stored = await db["enquiries"].find_one({"resort_id": listing["resort"]["_id"]})
 

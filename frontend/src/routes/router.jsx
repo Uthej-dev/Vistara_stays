@@ -14,10 +14,12 @@ import AccountPage from '../pages/AccountPage'
 import FavouritesPage from '../pages/FavouritesPage'
 import RequireAuth from '../features/auth/RequireAuth'
 import ResortPage from '../pages/ResortPage'
+import CheckoutPage from '../pages/booking/CheckoutPage'
+import PaymentPage from '../pages/booking/PaymentPage'
+import { TripPage, TripsPage } from '../pages/booking/TripsPages'
 
 // Routes that later phases implement. Listed here so every link in the UI resolves.
 const UPCOMING = [
-  { path: 'trips', title: 'Your trips', phase: 7 },
   { path: 'owners', title: 'List your property', phase: 8 },
   { path: 'owner', title: 'Owner dashboard', phase: 8 },
   { path: 'help', title: 'Help centre', phase: 11 },
@@ -50,7 +52,13 @@ export const routes = [
       },
       {
         element: <RequireAuth roles={['customer']} />,
-        children: [{ path: 'favourites', element: <FavouritesPage /> }],
+        children: [
+          { path: 'favourites', element: <FavouritesPage /> },
+          { path: 'checkout', element: <CheckoutPage /> },
+          { path: 'checkout/:bookingId', element: <PaymentPage /> },
+          { path: 'trips', element: <TripsPage /> },
+          { path: 'trips/:bookingId', element: <TripPage /> },
+        ],
       },
       ...UPCOMING.map(({ path, title, phase }) => ({
         path,

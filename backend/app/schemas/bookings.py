@@ -116,3 +116,60 @@ class EnquiryRequest(APIModel):
     message: Annotated[
         str, StringConstraints(strip_whitespace=True, min_length=10, max_length=1000)
     ]
+
+
+class BookingCreate(StayRequest):
+    guest_details: GuestDetails
+    special_requests: (
+        Annotated[str, StringConstraints(strip_whitespace=True, max_length=500)] | None
+    ) = None
+
+
+class CancelRequest(APIModel):
+    reason: Annotated[str, StringConstraints(strip_whitespace=True, max_length=300)] | None = None
+
+
+class CancellationPreview(BaseModel):
+    eligible: bool
+    refund_pct: int
+    refund_paise: int
+    days_before_check_in: int
+
+
+class BookingOut(BaseModel):
+    """A booking as its guest (or the property/admin) sees it. Prices and policies are the
+    snapshot taken when it was made, so later changes by the property never alter it."""
+
+    id: str
+    booking_ref: str
+    status: str
+    payment_status: str
+    resort_id: str
+    room_type_id: str
+    check_in: str
+    check_out: str
+    nights: int
+    rooms: int
+    guests: dict
+    guest_details: dict
+    special_requests: str | None = None
+    hold_expires_at: datetime
+    price: PriceBreakdown
+    policy_snapshot: dict
+    resort_snapshot: dict
+    coupon: dict | None = None
+    payment: dict | None = None
+    cancellation: dict | None = None
+    cancellation_preview: CancellationPreview | None = None
+    status_history: list[dict] = []
+    created_at: datetime
+    can_review: bool = False
+    review_id: str | None = None
+
+
+class BookingPage(BaseModel):
+    items: list[BookingOut]
+    page: int
+    page_size: int
+    total: int
+    total_pages: int

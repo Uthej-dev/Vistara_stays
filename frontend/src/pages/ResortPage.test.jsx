@@ -69,7 +69,7 @@ describe('ResortPage', () => {
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/login'))
     const next = decodeURIComponent(router.state.location.search.replace('?next=', ''))
-    expect(next).toBe(`/checkout?check_in=${checkIn}&check_out=${checkOut}&rooms=1&adults=2&children=0&room=rt1`)
+    expect(next).toBe(`/checkout?check_in=${checkIn}&check_out=${checkOut}&rooms=1&adults=2&children=0&room=rt1&resort=${DETAIL.slug}`)
   })
 
   it('sends signed-in customers straight to checkout', async () => {
