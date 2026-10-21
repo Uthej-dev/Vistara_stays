@@ -14,7 +14,13 @@ import { cn } from '../../utils/cn'
  * otherwise the caller sizes it, usually with an aspect-ratio class.
  */
 export default function SmartImage({ image, alt, sizes = '100vw', priority = false, fill = false, className, imgClassName }) {
-  const [status, setStatus] = useState(image?.src ? 'loading' : 'error')
+  const src = image?.src
+  // Status belongs to one src: when the image arrives later (e.g. after a query resolves) or
+  // changes, start loading again instead of keeping an earlier "error".
+  const [state, setState] = useState({ src, status: 'loading' })
+  if (state.src !== src) setState({ src, status: 'loading' })
+  const status = src ? (state.src === src ? state.status : 'loading') : 'error'
+  const setStatus = (next) => setState({ src, status: next })
   const altText = alt ?? image?.alt ?? ''
 
   const srcSet = image?.srcSet
