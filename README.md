@@ -53,6 +53,12 @@ resort name with dates and guests · filters (price per night or total stay, rat
 amenities, surroundings, distance) · sorting and URL-shareable results · resort pages with gallery,
 rooms, live availability, itemised prices, policies, map, nearby attractions, reviews, enquiries.
 
+**AI booking assistant** — a floating chat that asks for destination, dates, guests and rooms (plus
+optional budget and amenities), searches real availability with the same pricing engine, shows
+bookable resorts as cards, refines on request ("cheaper", "with a pool", "change my checkout") and
+hands off to the normal checkout. OpenAI tool calling; optional — off without `OPENAI_API_KEY`.
+See [docs/12](docs/12-ai-assistant.md).
+
 **Customers** — sign-up with email verification · password reset · favourites · booking with
 lead-guest details (18+, no ID numbers collected online) · coupons · hold countdown · simulated or
 Razorpay payment · trips, cancellations with refund preview · reviews after completed stays ·
@@ -140,6 +146,7 @@ The live demo runs the website and the API as two Vercel projects (`frontend/ver
 9. [Testing & security](docs/09-testing-and-security.md)
 10. [API reference (generated)](docs/10-api-reference.md)
 11. [Deployment](docs/11-deployment.md)
+12. [AI booking assistant](docs/12-ai-assistant.md)
 
 ## Limitations
 

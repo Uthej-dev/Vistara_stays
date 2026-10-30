@@ -16,6 +16,7 @@ A phase is **done** only when its exit criteria pass. Status is updated at the e
 | 10 | Payments (simulated → Razorpay test), notifications | Signature verification tests with known vectors; webhook idempotency; no "paid" from redirect alone | ✅ Done (2026-10-18) — 10 Razorpay tests against a fake Razorpay API (mutation-checked); live test mode needs your Razorpay test keys |
 | 11 | Full test pass, security review, E2E checklist | All suites green; coverage report; manual checklist signed off; security checklist | ✅ Done (2026-10-18) — 222 backend (92% coverage) + 79 frontend tests, 9/9 browser journeys, lint clean, 0 known vulnerabilities; see docs/09 |
 | 12 | Deployment + README | Live URLs; production CORS/cookies verified; README with screenshots & limitations | 🟡 Ready to deploy (2026-10-18): render.yaml, vercel.json (+CSP), CI workflow, deployment guide, README with screenshots. Production build + CSP verified locally (9/9 journeys, Lighthouse a11y 100). **Live URLs need your GitHub/Render/Vercel/Cloudinary accounts — follow docs/11.** |
+| 13 | AI booking assistant | Conversational requirement collection; tool calls reuse search/availability/pricing; prices identical to `/bookings/quote`; booking only via existing checkout; works without an API key | ✅ Done (2026-10-30) — 32 backend + 6 frontend tests; full conversation → cards → checkout verified in Chrome against a stand-in OpenAI API (live use needs your `OPENAI_API_KEY`). See docs/12 |
 
 ## Decisions (2026-10-17)
 

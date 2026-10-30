@@ -66,6 +66,13 @@ class Settings(BaseSettings):
     razorpay_key_secret: str | None = None
     razorpay_webhook_secret: str | None = None
 
+    # AI booking assistant. Without OPENAI_API_KEY the assistant reports itself unavailable and
+    # the rest of the site works as before. Any OpenAI-compatible endpoint works via the base URL.
+    openai_api_key: str | None = None
+    openai_model: str = "gpt-4.1-mini"
+    openai_base_url: str = "https://api.openai.com/v1"
+    openai_timeout_seconds: float = Field(30, gt=0, le=120)
+
     # Background maintenance loop (expire holds, complete stays) while the server is awake
     maintenance_interval_seconds: int = Field(60, ge=0, le=3600)
 
@@ -106,6 +113,10 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"
+
+    @property
+    def assistant_enabled(self) -> bool:
+        return bool(self.openai_api_key)
 
 
 @lru_cache

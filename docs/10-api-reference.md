@@ -46,6 +46,13 @@ Error format, pagination and money conventions: see [05-api-spec.md](05-api-spec
 | GET | `/api/v1/admin/users` | admin | users |
 | POST | `/api/v1/admin/users/{user_id}/{action}` | admin | Suspending signs the user out everywhere immediately. |
 
+## Assistant
+
+| Method | Path | Access | Purpose |
+|---|---|---|---|
+| POST | `/api/v1/assistant/chat` | public | One guest message → the assistant's reply, the updated search criteria, and result cards built from real availability and server-side prices. |
+| GET | `/api/v1/assistant/status` | public | Lets the chat widget say up front whether the assistant can answer. |
+
 ## Auth
 
 | Method | Path | Access | Purpose |

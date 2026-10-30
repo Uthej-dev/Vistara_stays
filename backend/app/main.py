@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import (
     admin,
+    assistant,
     auth,
     bookings,
     catalog,
@@ -121,6 +122,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.email_outbox = []  # console email backend keeps recent emails here
     app.state.sms_outbox = []  # console SMS backend keeps recent messages here
     app.state.razorpay_client = None  # tests inject a fake; None = real client from settings
+    app.state.llm_client = None  # tests inject a fake; None = OpenAI client from settings
     register_exception_handlers(app)
     for router in (
         health.router,
@@ -135,6 +137,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         notifications.router,
         uploads.router,
         admin.router,
+        assistant.router,
     ):
         app.include_router(router, prefix=API_PREFIX)
     if settings.image_storage == "local":

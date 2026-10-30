@@ -1,6 +1,7 @@
 import { Outlet, ScrollRestoration, useLocation } from 'react-router'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import AssistantMount from '../features/assistant/AssistantMount'
 
 export default function PublicLayout() {
   const { pathname } = useLocation()
@@ -19,6 +20,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
+      <AssistantMount />
       <ScrollRestoration />
     </div>
   )

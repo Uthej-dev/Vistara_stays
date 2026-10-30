@@ -18,6 +18,8 @@ os.environ.update(
         "JWT_SECRET": "test-secret-not-for-production-0123456789",
         "CORS_ORIGINS": "http://localhost:5173",
         "LOG_LEVEL": "WARNING",
+        # Never call a real AI provider from tests, even if backend/.env has a key.
+        "OPENAI_API_KEY": "",
     }
 )
 
